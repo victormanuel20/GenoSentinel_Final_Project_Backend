@@ -9,6 +9,9 @@ import com.creators.autenticacion.models.entities.Users;
 import com.creators.autenticacion.repository.RoleRepository;
 import com.creators.autenticacion.repository.UsersRepository;
 import com.creators.autenticacion.service.JwtService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -58,6 +61,17 @@ public class AuthController {
      * @param req mapa con username y password
      * @return mapa con el token, tipo y roles
      */
+
+    @Operation(
+            summary = "Login de usuario",
+            description = "Autentica al usuario usando username, email y password, y devuelve un token JWT."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Login exitoso, se devuelve el token"),
+            @ApiResponse(responseCode = "400", description = "Faltan campos obligatorios"),
+            @ApiResponse(responseCode = "401", description = "Email o credenciales inválidas"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
+    })
     @PostMapping("/login")
     public Map<String, Object> login(@RequestBody Map<String, String> req) {
         String username = req.get("username");
@@ -103,6 +117,15 @@ public class AuthController {
      */
 
 
+    @Operation(
+            summary = "Registro de nuevo usuario",
+            description = "Crea un usuario con rol USER, valida duplicados y devuelve un token JWT listo para usar."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Usuario creado correctamente"),
+            @ApiResponse(responseCode = "400", description = "Faltan campos obligatorios"),
+            @ApiResponse(responseCode = "409", description = "Username o email ya registrados")
+    })
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
