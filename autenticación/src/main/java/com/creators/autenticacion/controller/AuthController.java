@@ -2,9 +2,7 @@ package com.creators.autenticacion.controller;
 
 
 
-import com.creators.autenticacion.exceptions.InvalidEmailException;
-import com.creators.autenticacion.exceptions.MissingFieldsException;
-import com.creators.autenticacion.exceptions.UserNotFoundException;
+import com.creators.autenticacion.exceptions.*;
 import com.creators.autenticacion.models.dto.RegisterRequest;
 import com.creators.autenticacion.models.entities.Role;
 import com.creators.autenticacion.models.entities.Users;
@@ -109,11 +107,28 @@ public class AuthController {
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public Map<String, Object> register(@RequestBody RegisterRequest req) {
-        if (req.getUsername() == null || req.getPassword() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing username or password");
+        // Validar campos obligatorios
+        if (req.getUsername() == null || req.getUsername().isBlank()
+                || req.getPassword() == null || req.getPassword().isBlank()
+                || req.getEmail() == null || req.getEmail().isBlank()) {
+
+            throw new MissingFieldsException(
+                    "username, email y password son obligatorios"
+            );
         }
+
+        // Validar username duplicado
         if (usuarioRepo.findByUsername(req.getUsername()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
+            throw new UserAlreadyExistsException(
+                    "El nombre de usuario ya está registrado"
+            );
+        }
+
+        // Validar email duplicado (si quieres esta lógica también)
+        if (usuarioRepo.findByEmail(req.getEmail()).isPresent()) {
+            throw new EmailAlreadyExistsException(
+                    "El correo electrónico ya está registrado"
+            );
         }
 
         // Maanejo de solo un rol

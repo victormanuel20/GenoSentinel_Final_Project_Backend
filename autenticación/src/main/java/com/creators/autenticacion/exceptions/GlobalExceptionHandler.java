@@ -51,6 +51,18 @@ public class GlobalExceptionHandler {
                 ));
     }
 
+    
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<Map<String, Object>> handleEmailAlreadyExists(EmailAlreadyExistsException ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(Map.of(
+                        "error", "Email already exists",
+                        "message", ex.getMessage()
+                ));
+    }
+
+
     // Cuando no mandan body o mandan JSON inválido
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, Object>> handleNoBody(HttpMessageNotReadableException ex) {
@@ -61,5 +73,7 @@ public class GlobalExceptionHandler {
                         "message", "El cuerpo de la petición es inválido o está vacío"
                 ));
     }
+
+
 
 }
