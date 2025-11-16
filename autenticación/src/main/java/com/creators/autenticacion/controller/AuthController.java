@@ -3,6 +3,8 @@ package com.creators.autenticacion.controller;
 
 
 import com.creators.autenticacion.exceptions.InvalidEmailException;
+import com.creators.autenticacion.exceptions.MissingFieldsException;
+import com.creators.autenticacion.exceptions.UserNotFoundException;
 import com.creators.autenticacion.models.dto.RegisterRequest;
 import com.creators.autenticacion.models.entities.Role;
 import com.creators.autenticacion.models.entities.Users;
@@ -64,14 +66,25 @@ public class AuthController {
         String email = req.get("email");
         String password = req.get("password");
 
-        var user = usuarioRepo.findByUsername(username).orElseThrow();
+        // Validar campos obligatorios
+        if (username == null || username.isBlank()
+                || password == null || password.isBlank()
+                || email == null || email.isBlank()) {
+            throw new MissingFieldsException("username, email y password son obligatorios");
+        }
+
+        // Buscar usuario
+        var user = usuarioRepo.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("El usuario con ese username no existe"));
+
         var roles = user.getRoles().stream().map(Role::getName).toList();
 
-        if (email == null || !email.equals(user.getEmail())) {
+        // Validar email
+        if (!email.equals(user.getEmail())) {
             throw new InvalidEmailException("El correo electrónico no coincide con el registrado.");
         }
 
-        // Si las credenciales son incorrectas, lanza AuthenticationException → 401 por defecto
+        //  Autenticar credenciales (si falla, lanza AuthenticationException -> 401)
         authManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
         String token = jwt.generate(user.getUsername(), roles);
