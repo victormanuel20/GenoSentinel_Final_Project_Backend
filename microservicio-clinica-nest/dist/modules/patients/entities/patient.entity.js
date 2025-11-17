@@ -46,7 +46,7 @@ __decorate([
 ], Patient.prototype, "lastName", void 0);
 __decorate([
     (0, typeorm_1.Column)({ name: 'birth_date', type: 'date' }),
-    __metadata("design:type", Date)
+    __metadata("design:type", String)
 ], Patient.prototype, "birthDate", void 0);
 __decorate([
     (0, typeorm_1.Column)({

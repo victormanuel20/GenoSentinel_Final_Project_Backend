@@ -24,7 +24,7 @@ export class Patient {
   lastName: string;
 
   @Column({ name: 'birth_date', type: 'date' })
-  birthDate: Date;
+  birthDate: String;
 
   @Column({
     type: 'enum',

@@ -45,6 +45,7 @@ __decorate([
 ], PatientsController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Post)(),
+    (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
     (0, swagger_1.ApiOperation)({ summary: 'Crear un nuevo paciente' }),
     (0, swagger_1.ApiResponse)({
         status: 201,
@@ -53,7 +54,25 @@ __decorate([
     }),
     (0, swagger_1.ApiResponse)({
         status: 400,
-        description: 'Datos inválidos',
+        description: 'Datos inválidos (validación de campos)',
+        schema: {
+            example: {
+                statusCode: 400,
+                message: ['El nombre es obligatorio'],
+                error: 'Bad Request'
+            }
+        }
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 409,
+        description: 'El paciente ya existe (duplicado)',
+        schema: {
+            example: {
+                statusCode: 409,
+                message: 'Ya existe un paciente con el nombre Ana García López y fecha de nacimiento 1990-05-10',
+                error: 'Conflict'
+            }
+        }
     }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),

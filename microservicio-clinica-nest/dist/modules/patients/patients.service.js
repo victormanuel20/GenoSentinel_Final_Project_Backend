@@ -13,10 +13,11 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PatientsService = void 0;
-const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const patient_entity_1 = require("./entities/patient.entity");
+const common_1 = require("@nestjs/common");
+const PatientAlreadyExistsException_1 = require("./exceptions/PatientAlreadyExistsException");
 let PatientsService = class PatientsService {
     patientRepository;
     constructor(patientRepository) {
@@ -34,10 +35,26 @@ let PatientsService = class PatientsService {
         }));
     }
     async create(createPatientDto) {
+        const existingPatient = await this.patientRepository.findOne({
+            where: {
+                firstName: createPatientDto.firstName,
+                lastName: createPatientDto.lastName,
+                birthDate: createPatientDto.birthDate,
+            },
+        });
+        console.log('🔍 Buscando duplicado:', {
+            firstName: createPatientDto.firstName,
+            lastName: createPatientDto.lastName,
+            birthDate: createPatientDto.birthDate,
+        });
+        console.log('🔍 Resultado:', existingPatient);
+        if (existingPatient) {
+            throw new PatientAlreadyExistsException_1.PatientAlreadyExistsException(createPatientDto.firstName, createPatientDto.lastName, createPatientDto.birthDate);
+        }
         const patient = this.patientRepository.create({
             firstName: createPatientDto.firstName,
             lastName: createPatientDto.lastName,
-            birthDate: new Date(createPatientDto.birthDate),
+            birthDate: createPatientDto.birthDate,
             gender: createPatientDto.gender,
             status: createPatientDto.status,
         });

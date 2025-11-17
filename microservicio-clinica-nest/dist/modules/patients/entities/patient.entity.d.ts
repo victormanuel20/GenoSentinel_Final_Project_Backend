@@ -12,7 +12,7 @@ export declare class Patient {
     id: number;
     firstName: string;
     lastName: string;
-    birthDate: Date;
+    birthDate: String;
     gender: Gender;
     status: PatientStatus;
 }

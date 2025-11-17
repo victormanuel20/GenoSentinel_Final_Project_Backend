@@ -23,7 +23,7 @@ export class PatientResponseDto {
     example: '1990-05-10', 
     description: 'Fecha de nacimiento' 
   })
-  birthDate: Date;
+  birthDate: String;
 
   @ApiProperty({ 
     example: 'Femenino', 
