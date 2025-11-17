@@ -1,11 +1,13 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Like } from 'typeorm';
 import { Patient } from './entities/patient.entity';
 import { PatientResponseDto } from './dto/patient-response.dto';
 import { CreatePatientDto } from './dto/create-patient.dto';
+import { SearchPatientDto } from './dto/search-patient.dto';
 import { ConflictException, Injectable } from '@nestjs/common';
 import { PatientAlreadyExistsException } from './exceptions/PatientAlreadyExistsException';
-
+import { PatientNotFoundException } from './exceptions/patient-not-found.exception';
+import { InvalidSearchParamsException } from './exceptions/invalid-search-params.exception';
 
 
 
@@ -28,6 +30,50 @@ export class PatientsService {
       status: patient.status,
     }));
   }
+
+
+  // BUSCAR POR ID
+  async findOne(id: number): Promise<PatientResponseDto> {
+    const patient = await this.patientRepository.findOne({
+      where: { id },
+    });
+
+    if (!patient) {
+      throw new PatientNotFoundException(id);
+    }
+
+    return this.toResponseDto(patient);
+  }
+
+  // BUSCAR POR CRITERIOS (nombre, apellido, fecha)
+  async search(searchDto: SearchPatientDto): Promise<PatientResponseDto[]> {
+    // Validar que al menos un criterio esté presente
+    if (!searchDto.firstName && !searchDto.lastName && !searchDto.birthDate) {
+      throw new InvalidSearchParamsException();
+    }
+
+    // Construir query dinámica
+    const whereCondition: any = {};
+
+    if (searchDto.firstName) {
+      whereCondition.firstName = Like(`%${searchDto.firstName}%`); // Búsqueda parcial
+    }
+
+    if (searchDto.lastName) {
+      whereCondition.lastName = Like(`%${searchDto.lastName}%`); // Búsqueda parcial
+    }
+
+    if (searchDto.birthDate) {
+      whereCondition.birthDate = searchDto.birthDate; // Búsqueda exacta
+    }
+
+    const patients = await this.patientRepository.find({
+      where: whereCondition,
+    });
+
+    return patients.map(patient => this.toResponseDto(patient));
+  }
+
 
   async create(createPatientDto: CreatePatientDto): Promise<PatientResponseDto> {
     // 1. Buscar pacientes con el mismo nombre Y fecha
@@ -74,6 +120,18 @@ export class PatientsService {
       birthDate: savedPatient.birthDate,
       gender: savedPatient.gender,
       status: savedPatient.status,
+    };
+  }
+
+  //Convertir Entity a DTO
+  private toResponseDto(patient: Patient): PatientResponseDto {
+    return {
+      id: patient.id,
+      firstName: patient.firstName,
+      lastName: patient.lastName,
+      birthDate: patient.birthDate,
+      gender: patient.gender,
+      status: patient.status,
     };
   }
 

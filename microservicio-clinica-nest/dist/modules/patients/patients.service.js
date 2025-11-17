@@ -18,6 +18,8 @@ const typeorm_2 = require("typeorm");
 const patient_entity_1 = require("./entities/patient.entity");
 const common_1 = require("@nestjs/common");
 const PatientAlreadyExistsException_1 = require("./exceptions/PatientAlreadyExistsException");
+const patient_not_found_exception_1 = require("./exceptions/patient-not-found.exception");
+const invalid_search_params_exception_1 = require("./exceptions/invalid-search-params.exception");
 let PatientsService = class PatientsService {
     patientRepository;
     constructor(patientRepository) {
@@ -33,6 +35,34 @@ let PatientsService = class PatientsService {
             gender: patient.gender,
             status: patient.status,
         }));
+    }
+    async findOne(id) {
+        const patient = await this.patientRepository.findOne({
+            where: { id },
+        });
+        if (!patient) {
+            throw new patient_not_found_exception_1.PatientNotFoundException(id);
+        }
+        return this.toResponseDto(patient);
+    }
+    async search(searchDto) {
+        if (!searchDto.firstName && !searchDto.lastName && !searchDto.birthDate) {
+            throw new invalid_search_params_exception_1.InvalidSearchParamsException();
+        }
+        const whereCondition = {};
+        if (searchDto.firstName) {
+            whereCondition.firstName = (0, typeorm_2.Like)(`%${searchDto.firstName}%`);
+        }
+        if (searchDto.lastName) {
+            whereCondition.lastName = (0, typeorm_2.Like)(`%${searchDto.lastName}%`);
+        }
+        if (searchDto.birthDate) {
+            whereCondition.birthDate = searchDto.birthDate;
+        }
+        const patients = await this.patientRepository.find({
+            where: whereCondition,
+        });
+        return patients.map(patient => this.toResponseDto(patient));
     }
     async create(createPatientDto) {
         const existingPatient = await this.patientRepository.findOne({
@@ -66,6 +96,16 @@ let PatientsService = class PatientsService {
             birthDate: savedPatient.birthDate,
             gender: savedPatient.gender,
             status: savedPatient.status,
+        };
+    }
+    toResponseDto(patient) {
+        return {
+            id: patient.id,
+            firstName: patient.firstName,
+            lastName: patient.lastName,
+            birthDate: patient.birthDate,
+            gender: patient.gender,
+            status: patient.status,
         };
     }
 };

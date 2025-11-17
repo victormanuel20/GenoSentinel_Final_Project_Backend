@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const patients_service_1 = require("./patients.service");
 const create_patient_dto_1 = require("./dto/create-patient.dto");
 const patient_response_dto_1 = require("./dto/patient-response.dto");
+const search_patient_dto_1 = require("./dto/search-patient.dto");
 const swagger_1 = require("@nestjs/swagger");
 let PatientsController = class PatientsController {
     patientsService;
@@ -25,6 +26,12 @@ let PatientsController = class PatientsController {
     }
     async findAll() {
         return await this.patientsService.findAll();
+    }
+    async search(searchDto) {
+        return await this.patientsService.search(searchDto);
+    }
+    async findOne(id) {
+        return await this.patientsService.findOne(id);
     }
     async create(createPatientDto) {
         return await this.patientsService.create(createPatientDto);
@@ -43,6 +50,51 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], PatientsController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)('search'),
+    (0, swagger_1.ApiOperation)({ summary: 'Buscar pacientes por nombre, apellido o fecha de nacimiento' }),
+    (0, swagger_1.ApiQuery)({ name: 'firstName', required: false, description: 'Nombre del paciente (búsqueda parcial)' }),
+    (0, swagger_1.ApiQuery)({ name: 'lastName', required: false, description: 'Apellido del paciente (búsqueda parcial)' }),
+    (0, swagger_1.ApiQuery)({ name: 'birthDate', required: false, description: 'Fecha de nacimiento exacta (YYYY-MM-DD)' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Pacientes encontrados',
+        type: [patient_response_dto_1.PatientResponseDto],
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 400,
+        description: 'Debe proporcionar al menos un criterio de búsqueda',
+    }),
+    __param(0, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [search_patient_dto_1.SearchPatientDto]),
+    __metadata("design:returntype", Promise)
+], PatientsController.prototype, "search", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Obtener un paciente por ID' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'ID del paciente', example: 1 }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Paciente encontrado',
+        type: patient_response_dto_1.PatientResponseDto,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 404,
+        description: 'Paciente no encontrado',
+        schema: {
+            example: {
+                statusCode: 404,
+                message: "Paciente con identificador '999' no encontrado",
+                error: 'Not Found'
+            }
+        }
+    }),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], PatientsController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Post)(),
     (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),

@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete,HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete,HttpCode, HttpStatus,Query,ParseIntPipe } from '@nestjs/common';
 import { PatientsService } from './patients.service';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
 import { PatientResponseDto } from './dto/patient-response.dto';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { SearchPatientDto } from './dto/search-patient.dto';
+import { ApiTags, ApiOperation, ApiResponse,ApiParam, ApiQuery } from '@nestjs/swagger';
 
 
 
@@ -22,6 +23,50 @@ export class PatientsController {
   async findAll(): Promise<PatientResponseDto[]> {
     return await this.patientsService.findAll();
   }
+
+  //  BUSCAR POR CRITERIOS (debe ir ANTES de /:id)
+  @Get('search')
+  @ApiOperation({ summary: 'Buscar pacientes por nombre, apellido o fecha de nacimiento' })
+  @ApiQuery({ name: 'firstName', required: false, description: 'Nombre del paciente (búsqueda parcial)' })
+  @ApiQuery({ name: 'lastName', required: false, description: 'Apellido del paciente (búsqueda parcial)' })
+  @ApiQuery({ name: 'birthDate', required: false, description: 'Fecha de nacimiento exacta (YYYY-MM-DD)' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Pacientes encontrados',
+    type: [PatientResponseDto],
+  })
+  @ApiResponse({ 
+    status: 400, 
+    description: 'Debe proporcionar al menos un criterio de búsqueda',
+  })
+  async search(@Query() searchDto: SearchPatientDto): Promise<PatientResponseDto[]> {
+    return await this.patientsService.search(searchDto);
+  }
+
+  // 3. BUSCAR POR ID
+  @Get(':id')
+  @ApiOperation({ summary: 'Obtener un paciente por ID' })
+  @ApiParam({ name: 'id', description: 'ID del paciente', example: 1 })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Paciente encontrado',
+    type: PatientResponseDto,
+  })
+  @ApiResponse({ 
+    status: 404, 
+    description: 'Paciente no encontrado',
+    schema: {
+      example: {
+        statusCode: 404,
+        message: "Paciente con identificador '999' no encontrado",
+        error: 'Not Found'
+      }
+    }
+  })
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<PatientResponseDto> {
+    return await this.patientsService.findOne(id);
+  }
+
 
     @Post()
   @HttpCode(HttpStatus.CREATED)
