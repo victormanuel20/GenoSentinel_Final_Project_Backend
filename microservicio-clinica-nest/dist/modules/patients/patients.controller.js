@@ -20,6 +20,7 @@ const update_patient_dto_1 = require("./dto/update-patient.dto");
 const patient_response_dto_1 = require("./dto/patient-response.dto");
 const search_patient_dto_1 = require("./dto/search-patient.dto");
 const swagger_1 = require("@nestjs/swagger");
+const DesactivatePatientDto_1 = require("./dto/DesactivatePatientDto");
 let PatientsController = class PatientsController {
     patientsService;
     constructor(patientsService) {
@@ -39,6 +40,9 @@ let PatientsController = class PatientsController {
     }
     async update(id, updatePatientDto) {
         return await this.patientsService.update(id, updatePatientDto);
+    }
+    async desactivate(id, deactivatePatientDto) {
+        return await this.patientsService.desactivate(id, deactivatePatientDto);
     }
 };
 exports.PatientsController = PatientsController;
@@ -197,6 +201,53 @@ __decorate([
     __metadata("design:paramtypes", [Number, update_patient_dto_1.UpdatePatientDto]),
     __metadata("design:returntype", Promise)
 ], PatientsController.prototype, "update", null);
+__decorate([
+    (0, common_1.Patch)(':id/desactivate'),
+    (0, swagger_1.ApiOperation)({ summary: 'Desactivar un paciente (cambiar status a Inactivo)' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'ID del paciente a desactivar', example: 18 }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Paciente desactivado exitosamente',
+        type: patient_response_dto_1.PatientResponseDto,
+        schema: {
+            example: {
+                id: 18,
+                firstName: 'Estella',
+                lastName: 'Castañeda perez',
+                birthDate: '1988-03-11',
+                gender: 'Femenino',
+                status: 'Inactivo'
+            }
+        }
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 404,
+        description: 'Paciente no encontrado',
+        schema: {
+            example: {
+                statusCode: 404,
+                message: "Paciente con identificador '999' no encontrado",
+                error: 'Not Found'
+            }
+        }
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 409,
+        description: 'El paciente ya está inactivo',
+        schema: {
+            example: {
+                statusCode: 409,
+                message: "El paciente con ID 18 ya está inactivo",
+                error: 'Conflict'
+            }
+        }
+    }),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, DesactivatePatientDto_1.DesactivatePatientDto]),
+    __metadata("design:returntype", Promise)
+], PatientsController.prototype, "desactivate", null);
 exports.PatientsController = PatientsController = __decorate([
     (0, swagger_1.ApiTags)('Pacientes'),
     (0, common_1.Controller)('patients'),
