@@ -107,4 +107,64 @@ export class PatientsController {
   }
 
 
+  // ✅ 5. ACTUALIZAR PACIENTE (AGREGA ESTO)
+  @Patch(':id')
+  @ApiOperation({ summary: 'Actualizar un paciente existente' })
+  @ApiParam({ name: 'id', description: 'ID del paciente a actualizar', example: 18 })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Paciente actualizado exitosamente',
+    type: PatientResponseDto,
+    schema: {
+      example: {
+        id: 18,
+        firstName: 'Estella María',
+        lastName: 'Castañeda Pérez',
+        birthDate: '1988-03-11',
+        gender: 'Femenino',
+        status: 'Seguimiento'
+      }
+    }
+  })
+  @ApiResponse({ 
+    status: 400, 
+    description: 'Datos inválidos o actualización fallida',
+    schema: {
+      example: {
+        statusCode: 400,
+        message: ['El género debe ser Masculino, Femenino u Otro'],
+        error: 'Bad Request'
+      }
+    }
+  })
+  @ApiResponse({ 
+    status: 404, 
+    description: 'Paciente no encontrado',
+    schema: {
+      example: {
+        statusCode: 404,
+        message: "Paciente con identificador '999' no encontrado",
+        error: 'Not Found'
+      }
+    }
+  })
+  @ApiResponse({ 
+    status: 409, 
+    description: 'Ya existe otro paciente con esos datos',
+    schema: {
+      example: {
+        statusCode: 409,
+        message: 'Ya existe un paciente con el nombre Ana García López y fecha de nacimiento 1990-05-10',
+        error: 'Conflict'
+      }
+    }
+  })
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updatePatientDto: UpdatePatientDto,
+  ): Promise<PatientResponseDto> {
+    return await this.patientsService.update(id, updatePatientDto);
+  }
+
+
 }

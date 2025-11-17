@@ -4,11 +4,14 @@ import { Patient } from './entities/patient.entity';
 import { PatientResponseDto } from './dto/patient-response.dto';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { SearchPatientDto } from './dto/search-patient.dto';
+import { UpdatePatientDto } from './dto/update-patient.dto';
 import { ConflictException, Injectable } from '@nestjs/common';
 import { PatientAlreadyExistsException } from './exceptions/PatientAlreadyExistsException';
 import { PatientNotFoundException } from './exceptions/patient-not-found.exception';
 import { InvalidSearchParamsException } from './exceptions/invalid-search-params.exception';
 import { PatientsNotFoundException } from './exceptions/PatientsNotFoundException';
+import { PatientUpdateFailedException } from './exceptions/PatientUpdateFailedException';
+
 
 
 
@@ -141,6 +144,57 @@ export class PatientsService {
       status: patient.status,
     };
   }
+
+
+  async update(id: number, updatePatientDto: UpdatePatientDto): Promise<PatientResponseDto> {
+  // 1. Verificar que el paciente existe
+  const existingPatient = await this.patientRepository.findOne({
+    where: { id },
+  });
+
+  if (!existingPatient) {
+    throw new PatientNotFoundException(id);
+  }
+
+ // 2. Si se actualizan nombre, apellido o fecha → validar que no exista duplicado
+if (updatePatientDto.firstName || updatePatientDto.lastName || updatePatientDto.birthDate) {
+  const firstName = updatePatientDto.firstName ?? existingPatient.firstName;
+  const lastName = updatePatientDto.lastName ?? existingPatient.lastName;
+  const birthDate = updatePatientDto.birthDate ?? existingPatient.birthDate;
+
+  const duplicate = await this.patientRepository.findOne({
+    where: { firstName, lastName, birthDate },
+  });
+
+  // Si existe duplicado y NO es el mismo paciente que estamos actualizando
+  if (duplicate && duplicate.id !== id) {
+    throw new PatientAlreadyExistsException(
+      firstName, 
+      lastName, 
+      birthDate as string // ← AGREGAR "as string"
+    );
+  }
+}
+
+  // 3. Actualizar
+  try {
+    await this.patientRepository.update(id, updatePatientDto);
+  } catch (error) {
+    throw new PatientUpdateFailedException(id, error.message);
+  }
+
+  // 4. Retornar el paciente actualizado
+  const updatedPatient = await this.patientRepository.findOne({
+    where: { id },
+  });
+
+  // Validar que se obtuvo el paciente actualizado
+  if (!updatedPatient) {
+    throw new PatientNotFoundException(id);
+  }
+
+  return this.toResponseDto(updatedPatient);
+}
 
 
   /*  

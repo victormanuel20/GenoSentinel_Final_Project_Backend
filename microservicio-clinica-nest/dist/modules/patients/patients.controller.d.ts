@@ -1,5 +1,6 @@
 import { PatientsService } from './patients.service';
 import { CreatePatientDto } from './dto/create-patient.dto';
+import { UpdatePatientDto } from './dto/update-patient.dto';
 import { PatientResponseDto } from './dto/patient-response.dto';
 import { SearchPatientDto } from './dto/search-patient.dto';
 export declare class PatientsController {
@@ -9,4 +10,5 @@ export declare class PatientsController {
     search(searchDto: SearchPatientDto): Promise<PatientResponseDto[]>;
     findOne(id: number): Promise<PatientResponseDto>;
     create(createPatientDto: CreatePatientDto): Promise<PatientResponseDto>;
+    update(id: number, updatePatientDto: UpdatePatientDto): Promise<PatientResponseDto>;
 }

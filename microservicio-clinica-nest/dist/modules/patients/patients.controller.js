@@ -16,6 +16,7 @@ exports.PatientsController = void 0;
 const common_1 = require("@nestjs/common");
 const patients_service_1 = require("./patients.service");
 const create_patient_dto_1 = require("./dto/create-patient.dto");
+const update_patient_dto_1 = require("./dto/update-patient.dto");
 const patient_response_dto_1 = require("./dto/patient-response.dto");
 const search_patient_dto_1 = require("./dto/search-patient.dto");
 const swagger_1 = require("@nestjs/swagger");
@@ -35,6 +36,9 @@ let PatientsController = class PatientsController {
     }
     async create(createPatientDto) {
         return await this.patientsService.create(createPatientDto);
+    }
+    async update(id, updatePatientDto) {
+        return await this.patientsService.update(id, updatePatientDto);
     }
 };
 exports.PatientsController = PatientsController;
@@ -135,6 +139,64 @@ __decorate([
     __metadata("design:paramtypes", [create_patient_dto_1.CreatePatientDto]),
     __metadata("design:returntype", Promise)
 ], PatientsController.prototype, "create", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Actualizar un paciente existente' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'ID del paciente a actualizar', example: 18 }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Paciente actualizado exitosamente',
+        type: patient_response_dto_1.PatientResponseDto,
+        schema: {
+            example: {
+                id: 18,
+                firstName: 'Estella María',
+                lastName: 'Castañeda Pérez',
+                birthDate: '1988-03-11',
+                gender: 'Femenino',
+                status: 'Seguimiento'
+            }
+        }
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 400,
+        description: 'Datos inválidos o actualización fallida',
+        schema: {
+            example: {
+                statusCode: 400,
+                message: ['El género debe ser Masculino, Femenino u Otro'],
+                error: 'Bad Request'
+            }
+        }
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 404,
+        description: 'Paciente no encontrado',
+        schema: {
+            example: {
+                statusCode: 404,
+                message: "Paciente con identificador '999' no encontrado",
+                error: 'Not Found'
+            }
+        }
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 409,
+        description: 'Ya existe otro paciente con esos datos',
+        schema: {
+            example: {
+                statusCode: 409,
+                message: 'Ya existe un paciente con el nombre Ana García López y fecha de nacimiento 1990-05-10',
+                error: 'Conflict'
+            }
+        }
+    }),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, update_patient_dto_1.UpdatePatientDto]),
+    __metadata("design:returntype", Promise)
+], PatientsController.prototype, "update", null);
 exports.PatientsController = PatientsController = __decorate([
     (0, swagger_1.ApiTags)('Pacientes'),
     (0, common_1.Controller)('patients'),
