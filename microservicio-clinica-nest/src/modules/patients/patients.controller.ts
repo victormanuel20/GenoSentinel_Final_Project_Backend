@@ -24,7 +24,7 @@ export class PatientsController {
     return await this.patientsService.findAll();
   }
 
-  //  BUSCAR POR CRITERIOS (debe ir ANTES de /:id)
+  //  BUSCAR POR CRITERIOS 
   @Get('search')
   @ApiOperation({ summary: 'Buscar pacientes por nombre, apellido o fecha de nacimiento' })
   @ApiQuery({ name: 'firstName', required: false, description: 'Nombre del paciente (búsqueda parcial)' })
@@ -38,6 +38,10 @@ export class PatientsController {
   @ApiResponse({ 
     status: 400, 
     description: 'Debe proporcionar al menos un criterio de búsqueda',
+  })
+  @ApiResponse({
+  status: 404,
+  description: 'No se encontraron pacientes con los criterios proporcionados',
   })
   async search(@Query() searchDto: SearchPatientDto): Promise<PatientResponseDto[]> {
     return await this.patientsService.search(searchDto);

@@ -65,6 +65,10 @@ __decorate([
         status: 400,
         description: 'Debe proporcionar al menos un criterio de búsqueda',
     }),
+    (0, swagger_1.ApiResponse)({
+        status: 404,
+        description: 'No se encontraron pacientes con los criterios proporcionados',
+    }),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [search_patient_dto_1.SearchPatientDto]),

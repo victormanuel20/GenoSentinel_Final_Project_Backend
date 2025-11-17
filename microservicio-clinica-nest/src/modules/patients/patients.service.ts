@@ -8,6 +8,7 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { PatientAlreadyExistsException } from './exceptions/PatientAlreadyExistsException';
 import { PatientNotFoundException } from './exceptions/patient-not-found.exception';
 import { InvalidSearchParamsException } from './exceptions/invalid-search-params.exception';
+import { PatientsNotFoundException } from './exceptions/PatientsNotFoundException';
 
 
 
@@ -70,6 +71,12 @@ export class PatientsService {
     const patients = await this.patientRepository.find({
       where: whereCondition,
     });
+
+    // 4. Si no hay resultados → 404
+    if (!patients || patients.length === 0) {
+      throw new PatientsNotFoundException(searchDto);
+    }
+
 
     return patients.map(patient => this.toResponseDto(patient));
   }

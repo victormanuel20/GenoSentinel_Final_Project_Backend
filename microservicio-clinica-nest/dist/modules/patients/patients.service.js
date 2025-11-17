@@ -20,6 +20,7 @@ const common_1 = require("@nestjs/common");
 const PatientAlreadyExistsException_1 = require("./exceptions/PatientAlreadyExistsException");
 const patient_not_found_exception_1 = require("./exceptions/patient-not-found.exception");
 const invalid_search_params_exception_1 = require("./exceptions/invalid-search-params.exception");
+const PatientsNotFoundException_1 = require("./exceptions/PatientsNotFoundException");
 let PatientsService = class PatientsService {
     patientRepository;
     constructor(patientRepository) {
@@ -62,6 +63,9 @@ let PatientsService = class PatientsService {
         const patients = await this.patientRepository.find({
             where: whereCondition,
         });
+        if (!patients || patients.length === 0) {
+            throw new PatientsNotFoundException_1.PatientsNotFoundException(searchDto);
+        }
         return patients.map(patient => this.toResponseDto(patient));
     }
     async create(createPatientDto) {
