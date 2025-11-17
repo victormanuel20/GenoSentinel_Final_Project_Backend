@@ -8,8 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
-const app_controller_1 = require("./app.controller");
-const app_service_1 = require("./app.service");
+const typeorm_1 = require("@nestjs/typeorm");
 const patients_module_1 = require("./modules/patients/patients.module");
 const tumor_types_module_1 = require("./modules/tumor-types/tumor-types.module");
 const clinical_records_module_1 = require("./modules/clinical-records/clinical-records.module");
@@ -18,9 +17,23 @@ let AppModule = class AppModule {
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [patients_module_1.PatientsModule, tumor_types_module_1.TumorTypesModule, clinical_records_module_1.ClinicalRecordsModule],
-        controllers: [app_controller_1.AppController],
-        providers: [app_service_1.AppService],
+        imports: [
+            typeorm_1.TypeOrmModule.forRoot({
+                type: 'mysql',
+                host: 'localhost',
+                port: 3306,
+                username: 'root',
+                password: '123456',
+                database: 'genosentinel',
+                autoLoadEntities: true,
+                synchronize: false,
+            }),
+            patients_module_1.PatientsModule,
+            tumor_types_module_1.TumorTypesModule,
+            clinical_records_module_1.ClinicalRecordsModule,
+        ],
+        controllers: [],
+        providers: [],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map
