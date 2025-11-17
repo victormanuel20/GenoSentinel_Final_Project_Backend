@@ -33,6 +33,24 @@ let PatientsService = class PatientsService {
             status: patient.status,
         }));
     }
+    async create(createPatientDto) {
+        const patient = this.patientRepository.create({
+            firstName: createPatientDto.firstName,
+            lastName: createPatientDto.lastName,
+            birthDate: new Date(createPatientDto.birthDate),
+            gender: createPatientDto.gender,
+            status: createPatientDto.status,
+        });
+        const savedPatient = await this.patientRepository.save(patient);
+        return {
+            id: savedPatient.id,
+            firstName: savedPatient.firstName,
+            lastName: savedPatient.lastName,
+            birthDate: savedPatient.birthDate,
+            gender: savedPatient.gender,
+            status: savedPatient.status,
+        };
+    }
 };
 exports.PatientsService = PatientsService;
 exports.PatientsService = PatientsService = __decorate([

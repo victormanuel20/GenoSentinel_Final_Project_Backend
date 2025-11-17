@@ -22,4 +22,22 @@ export class PatientsController {
   async findAll(): Promise<PatientResponseDto[]> {
     return await this.patientsService.findAll();
   }
+
+  // Crear paciente
+  @Post()
+  @ApiOperation({ summary: 'Crear un nuevo paciente' })
+  @ApiResponse({ 
+    status: 201, 
+    description: 'Paciente creado exitosamente',
+    type: PatientResponseDto,
+  })
+  @ApiResponse({ 
+    status: 400, 
+    description: 'Datos inválidos',
+  })
+  async create(@Body() createPatientDto: CreatePatientDto): Promise<PatientResponseDto> {
+    return await this.patientsService.create(createPatientDto);
+  }
+
+
 }

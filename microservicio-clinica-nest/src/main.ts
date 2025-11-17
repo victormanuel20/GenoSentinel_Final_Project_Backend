@@ -1,12 +1,24 @@
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // ✅ Prefijo global para todas las rutas
   app.setGlobalPrefix('genosentinel/clinica');
+
+
+    // ✅ VALIDACIONES GLOBALES
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,              // Elimina propiedades no definidas en el DTO
+      forbidNonWhitelisted: true,   // Lanza error si hay propiedades extras
+      transform: true,               // Transforma tipos automáticamente
+    }),
+  );
 
   // ✅ Configuración de Swagger
   const config = new DocumentBuilder()

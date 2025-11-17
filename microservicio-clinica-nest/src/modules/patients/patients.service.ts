@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Patient } from './entities/patient.entity';
 import { PatientResponseDto } from './dto/patient-response.dto';
+import { CreatePatientDto } from './dto/create-patient.dto';
+
 
 @Injectable()
 export class PatientsService {
@@ -24,4 +26,31 @@ export class PatientsService {
       status: patient.status,
     }));
   }
+
+    // Crear paciente
+  async create(createPatientDto: CreatePatientDto): Promise<PatientResponseDto> {
+    // 1. Crear la entidad
+    const patient = this.patientRepository.create({
+      firstName: createPatientDto.firstName,
+      lastName: createPatientDto.lastName,
+      birthDate: new Date(createPatientDto.birthDate), // Convertir string a Date
+      gender: createPatientDto.gender,
+      status: createPatientDto.status,
+    });
+
+    // 2. Guardar en la BD
+    const savedPatient = await this.patientRepository.save(patient);
+
+    // 3. Retornar como DTO
+    return {
+      id: savedPatient.id,
+      firstName: savedPatient.firstName,
+      lastName: savedPatient.lastName,
+      birthDate: savedPatient.birthDate,
+      gender: savedPatient.gender,
+      status: savedPatient.status,
+    };
+  }
+
+
 }
