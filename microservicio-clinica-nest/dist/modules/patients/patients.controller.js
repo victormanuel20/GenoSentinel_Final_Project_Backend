@@ -12,6 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PatientsController = void 0;
 const common_1 = require("@nestjs/common");
 const patients_service_1 = require("./patients.service");
+const patient_response_dto_1 = require("./dto/patient-response.dto");
+const swagger_1 = require("@nestjs/swagger");
 let PatientsController = class PatientsController {
     patientsService;
     constructor(patientsService) {
@@ -24,11 +26,18 @@ let PatientsController = class PatientsController {
 exports.PatientsController = PatientsController;
 __decorate([
     (0, common_1.Get)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Obtener todos los pacientes' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Lista de pacientes obtenida exitosamente',
+        type: [patient_response_dto_1.PatientResponseDto]
+    }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], PatientsController.prototype, "findAll", null);
 exports.PatientsController = PatientsController = __decorate([
+    (0, swagger_1.ApiTags)('Pacientes'),
     (0, common_1.Controller)('patients'),
     __metadata("design:paramtypes", [patients_service_1.PatientsService])
 ], PatientsController);

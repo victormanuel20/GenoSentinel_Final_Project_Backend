@@ -3,13 +3,22 @@ import { PatientsService } from './patients.service';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
 import { PatientResponseDto } from './dto/patient-response.dto';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 
+
+@ApiTags('Pacientes') // ← Agrupa en Swagger bajo "Pacientes"
 @Controller('patients')
 export class PatientsController {
   constructor(private readonly patientsService: PatientsService) {}
 
   @Get()
+  @ApiOperation({ summary: 'Obtener todos los pacientes' }) // ← Descripción del endpoint
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Lista de pacientes obtenida exitosamente',
+    type: [PatientResponseDto] // ← Documenta el tipo de respuesta
+  })
   async findAll(): Promise<PatientResponseDto[]> {
     return await this.patientsService.findAll();
   }
