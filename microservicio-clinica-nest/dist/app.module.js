@@ -27,6 +27,7 @@ exports.AppModule = AppModule = __decorate([
                 database: 'genosentinel',
                 autoLoadEntities: true,
                 synchronize: false,
+                logging: true,
             }),
             patients_module_1.PatientsModule,
             tumor_types_module_1.TumorTypesModule,

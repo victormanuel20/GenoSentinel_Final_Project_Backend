@@ -1,9 +1,8 @@
-import { CreatePatientDto } from './dto/create-patient.dto';
-import { UpdatePatientDto } from './dto/update-patient.dto';
+import { Repository } from 'typeorm';
+import { Patient } from './entities/patient.entity';
+import { PatientResponseDto } from './dto/patient-response.dto';
 export declare class PatientsService {
-    create(createPatientDto: CreatePatientDto): string;
-    findAll(): string;
-    findOne(id: number): string;
-    update(id: number, updatePatientDto: UpdatePatientDto): string;
-    remove(id: number): string;
+    private readonly patientRepository;
+    constructor(patientRepository: Repository<Patient>);
+    findAll(): Promise<PatientResponseDto[]>;
 }
