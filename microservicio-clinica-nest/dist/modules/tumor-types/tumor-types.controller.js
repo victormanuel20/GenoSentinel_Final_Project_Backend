@@ -14,67 +14,55 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TumorTypesController = void 0;
 const common_1 = require("@nestjs/common");
+const swagger_1 = require("@nestjs/swagger");
 const tumor_types_service_1 = require("./tumor-types.service");
+const TumorTypeResponseDto_1 = require("./dto/TumorTypeResponseDto");
 const create_tumor_type_dto_1 = require("./dto/create-tumor-type.dto");
-const update_tumor_type_dto_1 = require("./dto/update-tumor-type.dto");
 let TumorTypesController = class TumorTypesController {
     tumorTypesService;
     constructor(tumorTypesService) {
         this.tumorTypesService = tumorTypesService;
     }
-    create(createTumorTypeDto) {
-        return this.tumorTypesService.create(createTumorTypeDto);
+    async create(createDto) {
+        return await this.tumorTypesService.create(createDto);
     }
-    findAll() {
-        return this.tumorTypesService.findAll();
-    }
-    findOne(id) {
-        return this.tumorTypesService.findOne(+id);
-    }
-    update(id, updateTumorTypeDto) {
-        return this.tumorTypesService.update(+id, updateTumorTypeDto);
-    }
-    remove(id) {
-        return this.tumorTypesService.remove(+id);
+    async findAll() {
+        return await this.tumorTypesService.findAll();
     }
 };
 exports.TumorTypesController = TumorTypesController;
 __decorate([
     (0, common_1.Post)(),
+    (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
+    (0, swagger_1.ApiOperation)({ summary: 'Crear un nuevo tipo de tumor' }),
+    (0, swagger_1.ApiResponse)({
+        status: 201,
+        description: 'Tipo de tumor creado exitosamente',
+        type: TumorTypeResponseDto_1.TumorTypeResponseDto,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 409,
+        description: 'Ya existe un tipo de tumor con ese nombre',
+    }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_tumor_type_dto_1.CreateTumorTypeDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], TumorTypesController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Obtener todos los tipos de tumor' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Lista de tipos de tumor',
+        type: [TumorTypeResponseDto_1.TumorTypeResponseDto],
+    }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], TumorTypesController.prototype, "findAll", null);
-__decorate([
-    (0, common_1.Get)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], TumorTypesController.prototype, "findOne", null);
-__decorate([
-    (0, common_1.Patch)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, update_tumor_type_dto_1.UpdateTumorTypeDto]),
-    __metadata("design:returntype", void 0)
-], TumorTypesController.prototype, "update", null);
-__decorate([
-    (0, common_1.Delete)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], TumorTypesController.prototype, "remove", null);
 exports.TumorTypesController = TumorTypesController = __decorate([
+    (0, swagger_1.ApiTags)('Tipos de Tumor'),
     (0, common_1.Controller)('tumor-types'),
     __metadata("design:paramtypes", [tumor_types_service_1.TumorTypesService])
 ], TumorTypesController);
