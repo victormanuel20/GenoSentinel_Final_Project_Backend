@@ -7,5 +7,6 @@ export declare class TumorTypesService {
     constructor(tumorTypeRepository: Repository<TumorType>);
     create(createDto: CreateTumorTypeDto): Promise<TumorTypeResponseDto>;
     findAll(): Promise<TumorTypeResponseDto[]>;
+    findOne(id: number): Promise<TumorTypeResponseDto>;
     private toResponseDto;
 }

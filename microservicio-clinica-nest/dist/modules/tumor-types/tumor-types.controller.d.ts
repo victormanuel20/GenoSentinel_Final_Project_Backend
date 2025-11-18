@@ -6,4 +6,5 @@ export declare class TumorTypesController {
     constructor(tumorTypesService: TumorTypesService);
     create(createDto: CreateTumorTypeDto): Promise<TumorTypeResponseDto>;
     findAll(): Promise<TumorTypeResponseDto[]>;
+    findOne(id: number): Promise<TumorTypeResponseDto>;
 }

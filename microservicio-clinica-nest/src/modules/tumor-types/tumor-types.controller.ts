@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete,HttpCode, HttpStatus} from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Patch, Param, Delete,HttpCode, HttpStatus,ParseIntPipe } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse,ApiParam } from '@nestjs/swagger';
 import { TumorTypesService } from './tumor-types.service';
 import { TumorTypeResponseDto } from './dto/TumorTypeResponseDto';
 import { CreateTumorTypeDto } from './dto/create-tumor-type.dto';
@@ -38,6 +38,33 @@ export class TumorTypesController {
   async findAll(): Promise<TumorTypeResponseDto[]> {
     return await this.tumorTypesService.findAll();
   }
+
+  //Listar solo por ID
+
+    // GET /tumor-types/:id
+  @Get(':id')
+  @ApiOperation({ summary: 'Obtener un tipo de tumor por ID' })
+  @ApiParam({
+    name: 'id',
+    description: 'ID del tipo de tumor',
+    example: 1,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Tipo de tumor encontrado',
+    type: TumorTypeResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Tipo de tumor no encontrado',
+  })
+  async findOne(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<TumorTypeResponseDto> {
+    return await this.tumorTypesService.findOne(id);
+  }
+
+
 
 
   /*

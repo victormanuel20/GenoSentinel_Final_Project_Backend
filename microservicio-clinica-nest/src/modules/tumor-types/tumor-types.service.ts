@@ -6,6 +6,7 @@ import { UpdateTumorTypeDto } from './dto/update-tumor-type.dto';
 import { TumorType } from './entities/tumor-type.entity';
 import { TumorTypeResponseDto } from './dto/TumorTypeResponseDto';
 import { TumorTypeAlreadyExistsException } from './exceptions/TumorTypeAlreadyExistsException';
+import { TumorTypeNotFoundException } from './exceptions/TumorTypeNotFoundException';
 
 
 @Injectable()
@@ -38,6 +39,20 @@ export class TumorTypesService {
   async findAll(): Promise<TumorTypeResponseDto[]> {
     const tumorTypes = await this.tumorTypeRepository.find();
     return tumorTypes.map(tt => this.toResponseDto(tt));
+  }
+
+
+  // 3. BUSCAR POR ID
+  async findOne(id: number): Promise<TumorTypeResponseDto> {
+    const tumorType = await this.tumorTypeRepository.findOne({
+      where: { id },
+    });
+
+    if (!tumorType) {
+      throw new TumorTypeNotFoundException(id);
+    }
+
+    return this.toResponseDto(tumorType);
   }
 
   // MÉTODO AUXILIAR

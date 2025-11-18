@@ -29,6 +29,9 @@ let TumorTypesController = class TumorTypesController {
     async findAll() {
         return await this.tumorTypesService.findAll();
     }
+    async findOne(id) {
+        return await this.tumorTypesService.findOne(id);
+    }
 };
 exports.TumorTypesController = TumorTypesController;
 __decorate([
@@ -61,6 +64,28 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], TumorTypesController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Obtener un tipo de tumor por ID' }),
+    (0, swagger_1.ApiParam)({
+        name: 'id',
+        description: 'ID del tipo de tumor',
+        example: 1,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Tipo de tumor encontrado',
+        type: TumorTypeResponseDto_1.TumorTypeResponseDto,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 404,
+        description: 'Tipo de tumor no encontrado',
+    }),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], TumorTypesController.prototype, "findOne", null);
 exports.TumorTypesController = TumorTypesController = __decorate([
     (0, swagger_1.ApiTags)('Tipos de Tumor'),
     (0, common_1.Controller)('tumor-types'),

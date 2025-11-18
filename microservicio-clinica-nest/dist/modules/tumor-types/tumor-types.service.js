@@ -18,6 +18,7 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const tumor_type_entity_1 = require("./entities/tumor-type.entity");
 const TumorTypeAlreadyExistsException_1 = require("./exceptions/TumorTypeAlreadyExistsException");
+const TumorTypeNotFoundException_1 = require("./exceptions/TumorTypeNotFoundException");
 let TumorTypesService = class TumorTypesService {
     tumorTypeRepository;
     constructor(tumorTypeRepository) {
@@ -37,6 +38,15 @@ let TumorTypesService = class TumorTypesService {
     async findAll() {
         const tumorTypes = await this.tumorTypeRepository.find();
         return tumorTypes.map(tt => this.toResponseDto(tt));
+    }
+    async findOne(id) {
+        const tumorType = await this.tumorTypeRepository.findOne({
+            where: { id },
+        });
+        if (!tumorType) {
+            throw new TumorTypeNotFoundException_1.TumorTypeNotFoundException(id);
+        }
+        return this.toResponseDto(tumorType);
     }
     toResponseDto(tumorType) {
         return {
