@@ -18,6 +18,7 @@ const swagger_1 = require("@nestjs/swagger");
 const tumor_types_service_1 = require("./tumor-types.service");
 const TumorTypeResponseDto_1 = require("./dto/TumorTypeResponseDto");
 const create_tumor_type_dto_1 = require("./dto/create-tumor-type.dto");
+const update_tumor_type_dto_1 = require("./dto/update-tumor-type.dto");
 let TumorTypesController = class TumorTypesController {
     tumorTypesService;
     constructor(tumorTypesService) {
@@ -31,6 +32,9 @@ let TumorTypesController = class TumorTypesController {
     }
     async findOne(id) {
         return await this.tumorTypesService.findOne(id);
+    }
+    async update(id, updateDto) {
+        return await this.tumorTypesService.update(id, updateDto);
     }
 };
 exports.TumorTypesController = TumorTypesController;
@@ -86,6 +90,72 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], TumorTypesController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Actualizar un tipo de tumor existente' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'ID del tipo de tumor a actualizar', example: 1 }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Tipo de tumor actualizado exitosamente',
+        type: TumorTypeResponseDto_1.TumorTypeResponseDto,
+        schema: {
+            example: {
+                id: 1,
+                name: 'Cáncer de mama triple negativo',
+                systemAffected: 'Glándulas mamarias'
+            }
+        }
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 400,
+        description: 'Datos inválidos o body vacío',
+        schema: {
+            examples: {
+                emptyBody: {
+                    value: {
+                        statusCode: 400,
+                        message: 'Debe proporcionar al menos un campo para actualizar (name o systemAffected)',
+                        error: 'Bad Request'
+                    }
+                },
+                emptyFields: {
+                    value: {
+                        statusCode: 400,
+                        message: ['El nombre es obligatorio', 'El sistema afectado es obligatorio'],
+                        error: 'Bad Request'
+                    }
+                }
+            }
+        }
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 404,
+        description: 'Tipo de tumor no encontrado',
+        schema: {
+            example: {
+                statusCode: 404,
+                message: 'Tipo de tumor con ID 999 no encontrado',
+                error: 'Not Found'
+            }
+        }
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 409,
+        description: 'Ya existe otro tipo de tumor con ese nombre',
+        schema: {
+            example: {
+                statusCode: 409,
+                message: 'Ya existe un tipo de tumor con el nombre "Cáncer de pulmón"',
+                error: 'Conflict'
+            }
+        }
+    }),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, update_tumor_type_dto_1.UpdateTumorTypeDto]),
+    __metadata("design:returntype", Promise)
+], TumorTypesController.prototype, "update", null);
 exports.TumorTypesController = TumorTypesController = __decorate([
     (0, swagger_1.ApiTags)('Tipos de Tumor'),
     (0, common_1.Controller)('tumor-types'),

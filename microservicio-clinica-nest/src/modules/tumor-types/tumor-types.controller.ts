@@ -65,6 +65,74 @@ export class TumorTypesController {
   }
 
 
+    // 4. ACTUALIZAR
+    @Patch(':id')
+    @ApiOperation({ summary: 'Actualizar un tipo de tumor existente' })
+    @ApiParam({ name: 'id', description: 'ID del tipo de tumor a actualizar', example: 1 })
+    @ApiResponse({ 
+      status: 200, 
+      description: 'Tipo de tumor actualizado exitosamente',
+      type: TumorTypeResponseDto,
+      schema: {
+        example: {
+          id: 1,
+          name: 'Cáncer de mama triple negativo',
+          systemAffected: 'Glándulas mamarias'
+        }
+      }
+    })
+    @ApiResponse({ 
+      status: 400, 
+      description: 'Datos inválidos o body vacío',
+      schema: {
+        examples: {
+          emptyBody: {
+            value: {
+              statusCode: 400,
+              message: 'Debe proporcionar al menos un campo para actualizar (name o systemAffected)',
+              error: 'Bad Request'
+            }
+          },
+          emptyFields: {
+            value: {
+              statusCode: 400,
+              message: ['El nombre es obligatorio', 'El sistema afectado es obligatorio'],
+              error: 'Bad Request'
+            }
+          }
+        }
+      }
+    })
+    @ApiResponse({ 
+      status: 404, 
+      description: 'Tipo de tumor no encontrado',
+      schema: {
+        example: {
+          statusCode: 404,
+          message: 'Tipo de tumor con ID 999 no encontrado',
+          error: 'Not Found'
+        }
+      }
+    })
+    @ApiResponse({ 
+      status: 409, 
+      description: 'Ya existe otro tipo de tumor con ese nombre',
+      schema: {
+        example: {
+          statusCode: 409,
+          message: 'Ya existe un tipo de tumor con el nombre "Cáncer de pulmón"',
+          error: 'Conflict'
+        }
+      }
+    })
+    async update(
+      @Param('id', ParseIntPipe) id: number,
+      @Body() updateDto: UpdateTumorTypeDto,
+    ): Promise<TumorTypeResponseDto> {
+      return await this.tumorTypesService.update(id, updateDto);
+    }
+
+
 
 
   /*

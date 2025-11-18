@@ -19,6 +19,7 @@ const typeorm_2 = require("typeorm");
 const tumor_type_entity_1 = require("./entities/tumor-type.entity");
 const TumorTypeAlreadyExistsException_1 = require("./exceptions/TumorTypeAlreadyExistsException");
 const TumorTypeNotFoundException_1 = require("./exceptions/TumorTypeNotFoundException");
+const EmptyUpdateDataException_1 = require("./exceptions/EmptyUpdateDataException ");
 let TumorTypesService = class TumorTypesService {
     tumorTypeRepository;
     constructor(tumorTypeRepository) {
@@ -47,6 +48,40 @@ let TumorTypesService = class TumorTypesService {
             throw new TumorTypeNotFoundException_1.TumorTypeNotFoundException(id);
         }
         return this.toResponseDto(tumorType);
+    }
+    async update(id, updateDto) {
+        const existingTumorType = await this.tumorTypeRepository.findOne({
+            where: { id },
+        });
+        if (!existingTumorType) {
+            throw new TumorTypeNotFoundException_1.TumorTypeNotFoundException(id);
+        }
+        const updateData = {};
+        if (updateDto.name !== undefined && updateDto.name.trim() !== '') {
+            updateData.name = updateDto.name.trim();
+        }
+        if (updateDto.systemAffected !== undefined && updateDto.systemAffected.trim() !== '') {
+            updateData.systemAffected = updateDto.systemAffected.trim();
+        }
+        if (Object.keys(updateData).length === 0) {
+            throw new EmptyUpdateDataException_1.EmptyUpdateDataException();
+        }
+        if (updateData.name && updateData.name !== existingTumorType.name) {
+            const duplicateTumorType = await this.tumorTypeRepository.findOne({
+                where: { name: updateData.name },
+            });
+            if (duplicateTumorType) {
+                throw new TumorTypeAlreadyExistsException_1.TumorTypeAlreadyExistsException(updateData.name);
+            }
+        }
+        await this.tumorTypeRepository.update(id, updateData);
+        const updatedTumorType = await this.tumorTypeRepository.findOne({
+            where: { id },
+        });
+        if (!updatedTumorType) {
+            throw new TumorTypeNotFoundException_1.TumorTypeNotFoundException(id);
+        }
+        return this.toResponseDto(updatedTumorType);
     }
     toResponseDto(tumorType) {
         return {

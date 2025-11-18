@@ -7,6 +7,8 @@ import { TumorType } from './entities/tumor-type.entity';
 import { TumorTypeResponseDto } from './dto/TumorTypeResponseDto';
 import { TumorTypeAlreadyExistsException } from './exceptions/TumorTypeAlreadyExistsException';
 import { TumorTypeNotFoundException } from './exceptions/TumorTypeNotFoundException';
+import { EmptyUpdateDataException } from './exceptions/EmptyUpdateDataException ';
+
 
 
 @Injectable()
@@ -53,6 +55,60 @@ export class TumorTypesService {
     }
 
     return this.toResponseDto(tumorType);
+  }
+
+      
+    // 4. ACTUALIZAR TIPO DE TUMOR
+  async update(id: number, updateDto: UpdateTumorTypeDto): Promise<TumorTypeResponseDto> {
+    // 1. Verificar que el tipo de tumor existe
+    const existingTumorType = await this.tumorTypeRepository.findOne({
+      where: { id },
+    });
+
+    if (!existingTumorType) {
+      throw new TumorTypeNotFoundException(id);
+    }
+
+    // 2. Construir objeto con solo los campos que tienen valor
+    const updateData: Partial<TumorType> = {};
+
+    if (updateDto.name !== undefined && updateDto.name.trim() !== '') {
+      updateData.name = updateDto.name.trim();
+    }
+
+    if (updateDto.systemAffected !== undefined && updateDto.systemAffected.trim() !== '') {
+      updateData.systemAffected = updateDto.systemAffected.trim();
+    }
+
+    // 3. Validar que hay al menos un campo para actualizar
+    if (Object.keys(updateData).length === 0) {
+      throw new EmptyUpdateDataException();
+    }
+
+    // 4. Si se actualiza el nombre, validar que no exista otro tipo de tumor con ese nombre
+    if (updateData.name && updateData.name !== existingTumorType.name) {
+      const duplicateTumorType = await this.tumorTypeRepository.findOne({
+        where: { name: updateData.name },
+      });
+
+      if (duplicateTumorType) {
+        throw new TumorTypeAlreadyExistsException(updateData.name);
+      }
+    }
+
+    // 5. Actualizar solo con los campos válidos
+    await this.tumorTypeRepository.update(id, updateData);
+
+    // 6. Retornar el tipo de tumor actualizado
+    const updatedTumorType = await this.tumorTypeRepository.findOne({
+      where: { id },
+    });
+
+    if (!updatedTumorType) {
+      throw new TumorTypeNotFoundException(id);
+    }
+
+    return this.toResponseDto(updatedTumorType);
   }
 
   // MÉTODO AUXILIAR
