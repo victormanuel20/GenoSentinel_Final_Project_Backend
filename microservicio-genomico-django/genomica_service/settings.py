@@ -74,10 +74,19 @@ WSGI_APPLICATION = 'genomica_service.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'genosentinel',        # el nombre de tu BD
+        'USER': 'root',                   # tu usuario
+        'PASSWORD': 'mc4A5T8d',        # tu password
+        'HOST': 'localhost',
+        'PORT': '3306',
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+        }
     }
 }
+
 
 
 # Password validation
