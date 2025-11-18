@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Patient = exports.PatientStatus = exports.Gender = void 0;
 const typeorm_1 = require("typeorm");
+const clinical_record_entity_1 = require("../../clinical-records/entities/clinical-record.entity");
 var Gender;
 (function (Gender) {
     Gender["MASCULINO"] = "Masculino";
@@ -30,6 +31,7 @@ let Patient = class Patient {
     birthDate;
     gender;
     status;
+    clinicalRecords;
 };
 exports.Patient = Patient;
 __decorate([
@@ -63,6 +65,10 @@ __decorate([
     }),
     __metadata("design:type", String)
 ], Patient.prototype, "status", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => clinical_record_entity_1.ClinicalRecord, (record) => record.patient),
+    __metadata("design:type", Array)
+], Patient.prototype, "clinicalRecords", void 0);
 exports.Patient = Patient = __decorate([
     (0, typeorm_1.Entity)('patient')
 ], Patient);
