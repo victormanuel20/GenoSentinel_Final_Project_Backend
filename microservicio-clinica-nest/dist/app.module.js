@@ -23,7 +23,7 @@ exports.AppModule = AppModule = __decorate([
                 host: 'localhost',
                 port: 3306,
                 username: 'root',
-                password: '123456',
+                password: 'mc4A5T8d',
                 database: 'genosentinel',
                 autoLoadEntities: true,
                 synchronize: false,
