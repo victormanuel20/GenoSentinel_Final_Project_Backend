@@ -1,3 +1,4 @@
+import { ClinicalRecord } from '../../clinical-records/entities/clinical-record.entity';
 export declare enum Gender {
     MASCULINO = "Masculino",
     FEMENINO = "Femenino",
@@ -15,4 +16,5 @@ export declare class Patient {
     birthDate: String;
     gender: Gender;
     status: PatientStatus;
+    clinicalRecords: ClinicalRecord[];
 }

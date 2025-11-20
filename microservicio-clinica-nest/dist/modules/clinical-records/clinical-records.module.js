@@ -8,15 +8,21 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClinicalRecordsModule = void 0;
 const common_1 = require("@nestjs/common");
+const typeorm_1 = require("@nestjs/typeorm");
 const clinical_records_service_1 = require("./clinical-records.service");
 const clinical_records_controller_1 = require("./clinical-records.controller");
+const clinical_record_entity_1 = require("./entities/clinical-record.entity");
 let ClinicalRecordsModule = class ClinicalRecordsModule {
 };
 exports.ClinicalRecordsModule = ClinicalRecordsModule;
 exports.ClinicalRecordsModule = ClinicalRecordsModule = __decorate([
     (0, common_1.Module)({
+        imports: [
+            typeorm_1.TypeOrmModule.forFeature([clinical_record_entity_1.ClinicalRecord]),
+        ],
         controllers: [clinical_records_controller_1.ClinicalRecordsController],
         providers: [clinical_records_service_1.ClinicalRecordsService],
+        exports: [clinical_records_service_1.ClinicalRecordsService],
     })
 ], ClinicalRecordsModule);
 //# sourceMappingURL=clinical-records.module.js.map

@@ -1,4 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { ClinicalRecord } from '../../clinical-records/entities/clinical-record.entity';
+
 
 export enum Gender {
   MASCULINO = 'Masculino',
@@ -39,7 +41,8 @@ export class Patient {
   })
   status: PatientStatus;
 
-  // ⚠️ COMENTADO por ahora - lo activamos después
-  // @OneToMany(() => ClinicalRecord, (record) => record.patient)
-  // clinicalRecords: ClinicalRecord[];
+  
+  @OneToMany(() => ClinicalRecord, (record) => record.patient)
+  clinicalRecords: ClinicalRecord[];
+
 }

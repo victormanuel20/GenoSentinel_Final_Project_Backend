@@ -21,6 +21,8 @@ const PatientAlreadyExistsException_1 = require("./exceptions/PatientAlreadyExis
 const patient_not_found_exception_1 = require("./exceptions/patient-not-found.exception");
 const invalid_search_params_exception_1 = require("./exceptions/invalid-search-params.exception");
 const PatientsNotFoundException_1 = require("./exceptions/PatientsNotFoundException");
+const PatientUpdateFailedException_1 = require("./exceptions/PatientUpdateFailedException");
+const PatientAlreadyInactiveException_1 = require("./exceptions/PatientAlreadyInactiveException");
 let PatientsService = class PatientsService {
     patientRepository;
     constructor(patientRepository) {
@@ -111,6 +113,64 @@ let PatientsService = class PatientsService {
             gender: patient.gender,
             status: patient.status,
         };
+    }
+    async update(id, updatePatientDto) {
+        const existingPatient = await this.patientRepository.findOne({
+            where: { id },
+        });
+        if (!existingPatient) {
+            throw new patient_not_found_exception_1.PatientNotFoundException(id);
+        }
+        if (updatePatientDto.firstName || updatePatientDto.lastName || updatePatientDto.birthDate) {
+            const firstName = updatePatientDto.firstName ?? existingPatient.firstName;
+            const lastName = updatePatientDto.lastName ?? existingPatient.lastName;
+            const birthDate = updatePatientDto.birthDate ?? existingPatient.birthDate;
+            const duplicate = await this.patientRepository.findOne({
+                where: { firstName, lastName, birthDate },
+            });
+            if (duplicate && duplicate.id !== id) {
+                throw new PatientAlreadyExistsException_1.PatientAlreadyExistsException(firstName, lastName, birthDate);
+            }
+        }
+        try {
+            await this.patientRepository.update(id, updatePatientDto);
+        }
+        catch (error) {
+            throw new PatientUpdateFailedException_1.PatientUpdateFailedException(id, error.message);
+        }
+        const updatedPatient = await this.patientRepository.findOne({
+            where: { id },
+        });
+        if (!updatedPatient) {
+            throw new patient_not_found_exception_1.PatientNotFoundException(id);
+        }
+        return this.toResponseDto(updatedPatient);
+    }
+    async desactivate(id, deactivatePatientDto) {
+        const existingPatient = await this.patientRepository.findOne({
+            where: { id },
+        });
+        if (!existingPatient) {
+            throw new patient_not_found_exception_1.PatientNotFoundException(id);
+        }
+        if (existingPatient.status === deactivatePatientDto.status) {
+            throw new PatientAlreadyInactiveException_1.PatientAlreadyInactiveException(id);
+        }
+        try {
+            await this.patientRepository.update(id, {
+                status: deactivatePatientDto.status,
+            });
+        }
+        catch (error) {
+            throw new PatientUpdateFailedException_1.PatientUpdateFailedException(id, error.message);
+        }
+        const updatedPatient = await this.patientRepository.findOne({
+            where: { id },
+        });
+        if (!updatedPatient) {
+            throw new patient_not_found_exception_1.PatientNotFoundException(id);
+        }
+        return this.toResponseDto(updatedPatient);
     }
 };
 exports.PatientsService = PatientsService;

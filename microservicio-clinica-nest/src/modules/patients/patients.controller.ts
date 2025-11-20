@@ -5,6 +5,8 @@ import { UpdatePatientDto } from './dto/update-patient.dto';
 import { PatientResponseDto } from './dto/patient-response.dto';
 import { SearchPatientDto } from './dto/search-patient.dto';
 import { ApiTags, ApiOperation, ApiResponse,ApiParam, ApiQuery } from '@nestjs/swagger';
+import { DesactivatePatientDto } from './dto/DesactivatePatientDto';
+
 
 
 
@@ -105,6 +107,114 @@ export class PatientsController {
   async create(@Body() createPatientDto: CreatePatientDto): Promise<PatientResponseDto> {
     return await this.patientsService.create(createPatientDto);
   }
+
+
+  // ACTUALIZAR PACIENTE
+  @Patch(':id')
+  @ApiOperation({ summary: 'Actualizar un paciente existente' })
+  @ApiParam({ name: 'id', description: 'ID del paciente a actualizar', example: 18 })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Paciente actualizado exitosamente',
+    type: PatientResponseDto,
+    schema: {
+      example: {
+        id: 18,
+        firstName: 'Estella María',
+        lastName: 'Castañeda Pérez',
+        birthDate: '1988-03-11',
+        gender: 'Femenino',
+        status: 'Seguimiento'
+      }
+    }
+  })
+  @ApiResponse({ 
+    status: 400, 
+    description: 'Datos inválidos o actualización fallida',
+    schema: {
+      example: {
+        statusCode: 400,
+        message: ['El género debe ser Masculino, Femenino u Otro'],
+        error: 'Bad Request'
+      }
+    }
+  })
+  @ApiResponse({ 
+    status: 404, 
+    description: 'Paciente no encontrado',
+    schema: {
+      example: {
+        statusCode: 404,
+        message: "Paciente con identificador '999' no encontrado",
+        error: 'Not Found'
+      }
+    }
+  })
+  @ApiResponse({ 
+    status: 409, 
+    description: 'Ya existe otro paciente con esos datos',
+    schema: {
+      example: {
+        statusCode: 409,
+        message: 'Ya existe un paciente con el nombre Ana García López y fecha de nacimiento 1990-05-10',
+        error: 'Conflict'
+      }
+    }
+  })
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updatePatientDto: UpdatePatientDto,
+  ): Promise<PatientResponseDto> {
+    return await this.patientsService.update(id, updatePatientDto);
+  }
+
+  //DESACTIVAR UN PACIENTE 
+  @Patch(':id/desactivate')
+@ApiOperation({ summary: 'Desactivar un paciente (cambiar status a Inactivo)' })
+@ApiParam({ name: 'id', description: 'ID del paciente a desactivar', example: 18 })
+@ApiResponse({ 
+  status: 200, 
+  description: 'Paciente desactivado exitosamente',
+  type: PatientResponseDto,
+  schema: {
+    example: {
+      id: 18,
+      firstName: 'Estella',
+      lastName: 'Castañeda perez',
+      birthDate: '1988-03-11',
+      gender: 'Femenino',
+      status: 'Inactivo'
+    }
+  }
+})
+@ApiResponse({ 
+  status: 404, 
+  description: 'Paciente no encontrado',
+  schema: {
+    example: {
+      statusCode: 404,
+      message: "Paciente con identificador '999' no encontrado",
+      error: 'Not Found'
+    }
+  }
+})
+@ApiResponse({ 
+  status: 409, 
+  description: 'El paciente ya está inactivo',
+  schema: {
+    example: {
+      statusCode: 409,
+      message: "El paciente con ID 18 ya está inactivo",
+      error: 'Conflict'
+    }
+  }
+})
+async desactivate(
+  @Param('id', ParseIntPipe) id: number,
+  @Body() deactivatePatientDto: DesactivatePatientDto, 
+): Promise<PatientResponseDto> {
+  return await this.patientsService.desactivate(id, deactivatePatientDto);
+}
 
 
 }

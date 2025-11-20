@@ -4,11 +4,15 @@ import { Patient } from './entities/patient.entity';
 import { PatientResponseDto } from './dto/patient-response.dto';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { SearchPatientDto } from './dto/search-patient.dto';
+import { UpdatePatientDto } from './dto/update-patient.dto';
+import { DesactivatePatientDto } from './dto/DesactivatePatientDto';
 import { ConflictException, Injectable } from '@nestjs/common';
 import { PatientAlreadyExistsException } from './exceptions/PatientAlreadyExistsException';
 import { PatientNotFoundException } from './exceptions/patient-not-found.exception';
 import { InvalidSearchParamsException } from './exceptions/invalid-search-params.exception';
 import { PatientsNotFoundException } from './exceptions/PatientsNotFoundException';
+import { PatientUpdateFailedException } from './exceptions/PatientUpdateFailedException';
+import { PatientAlreadyInactiveException } from './exceptions/PatientAlreadyInactiveException';
 
 
 
@@ -143,83 +147,94 @@ export class PatientsService {
   }
 
 
-  /*  
-    // Crear paciente-- PRIMERA FORMA 
-  async create(createPatientDto: CreatePatientDto): Promise<PatientResponseDto> {
-    // 1. Crear la entidad
-    const patient = this.patientRepository.create({
-      firstName: createPatientDto.firstName,
-      lastName: createPatientDto.lastName,
-      birthDate: new Date(createPatientDto.birthDate), // Convertir string a Date
-      gender: createPatientDto.gender,
-      status: createPatientDto.status,
-    });
+  async update(id: number, updatePatientDto: UpdatePatientDto): Promise<PatientResponseDto> {
+  // 1. Verificar que el paciente existe
+  const existingPatient = await this.patientRepository.findOne({
+    where: { id },
+  });
 
-    // 2. Guardar en la BD
-    const savedPatient = await this.patientRepository.save(patient);
-
-    // 3. Retornar como DTO
-    return {
-      id: savedPatient.id,
-      firstName: savedPatient.firstName,
-      lastName: savedPatient.lastName,
-      birthDate: savedPatient.birthDate,
-      gender: savedPatient.gender,
-      status: savedPatient.status,
-    };
+  if (!existingPatient) {
+    throw new PatientNotFoundException(id);
   }
 
-  
+ // 2. Si se actualizan nombre, apellido o fecha → validar que no exista duplicado
+if (updatePatientDto.firstName || updatePatientDto.lastName || updatePatientDto.birthDate) {
+  const firstName = updatePatientDto.firstName ?? existingPatient.firstName;
+  const lastName = updatePatientDto.lastName ?? existingPatient.lastName;
+  const birthDate = updatePatientDto.birthDate ?? existingPatient.birthDate;
 
-  async create(createPatientDto: CreatePatientDto): Promise<PatientResponseDto> {
-     // ✅ 1. Validar que no exista un paciente duplicado
-  const existingPatient = await this.patientRepository.findOne({
-    where: {
-      firstName: createPatientDto.firstName,
-      lastName: createPatientDto.lastName,
-      birthDate: new Date(createPatientDto.birthDate),
-    },
+  const duplicate = await this.patientRepository.findOne({
+    where: { firstName, lastName, birthDate },
   });
 
-  console.log('🔍 Buscando duplicado:', {
-    firstName: createPatientDto.firstName,
-    lastName: createPatientDto.lastName,
-    birthDate: new Date(createPatientDto.birthDate),
-  });
-  console.log('🔍 Resultado:', existingPatient);
-
-  if (existingPatient) {
+  // Si existe duplicado y NO es el mismo paciente que estamos actualizando
+  if (duplicate && duplicate.id !== id) {
     throw new PatientAlreadyExistsException(
-      createPatientDto.firstName,
-      createPatientDto.lastName,
-      createPatientDto.birthDate,
+      firstName, 
+      lastName, 
+      birthDate as string // ← AGREGAR "as string"
     );
   }
+}
 
-    // 2. Crear la entidad
-    const patient = this.patientRepository.create({
-      firstName: createPatientDto.firstName,
-      lastName: createPatientDto.lastName,
-      birthDate: new Date(createPatientDto.birthDate),
-      gender: createPatientDto.gender,
-      status: createPatientDto.status,
-    });
-
-    // 3. Guardar en la BD
-    const savedPatient = await this.patientRepository.save(patient);
-
-    // 4. Retornar como DTO
-    return {
-      id: savedPatient.id,
-      firstName: savedPatient.firstName,
-      lastName: savedPatient.lastName,
-      birthDate: savedPatient.birthDate,
-      gender: savedPatient.gender,
-      status: savedPatient.status,
-    };
+  // 3. Actualizar
+  try {
+    await this.patientRepository.update(id, updatePatientDto);
+  } catch (error) {
+    throw new PatientUpdateFailedException(id, error.message);
   }
 
-  */
+  // 4. Retornar el paciente actualizado
+  const updatedPatient = await this.patientRepository.findOne({
+    where: { id },
+  });
+
+  // Validar que se obtuvo el paciente actualizado
+  if (!updatedPatient) {
+    throw new PatientNotFoundException(id);
+  }
+
+  return this.toResponseDto(updatedPatient);
+}
+
+//Desactivar paciente 
+async desactivate(id: number, deactivatePatientDto: DesactivatePatientDto): Promise<PatientResponseDto> {
+  // 1. Verificar que el paciente existe
+  const existingPatient = await this.patientRepository.findOne({
+    where: { id },
+  });
+
+  if (!existingPatient) {
+    throw new PatientNotFoundException(id);
+  }
+
+  // 2. Verificar si ya está en el estado que se quiere poner
+  if (existingPatient.status === deactivatePatientDto.status) {
+    throw new PatientAlreadyInactiveException(id);
+  }
+
+  // 3. Actualizar el status
+  try {
+    await this.patientRepository.update(id, {
+      status: deactivatePatientDto.status,
+    });
+  } catch (error) {
+    throw new PatientUpdateFailedException(id, error.message);
+  }
+
+  // 4. Retornar el paciente actualizado
+  const updatedPatient = await this.patientRepository.findOne({
+    where: { id },
+  });
+
+  if (!updatedPatient) {
+    throw new PatientNotFoundException(id);
+  }
+
+  return this.toResponseDto(updatedPatient);
+}
+
+
 
 
 }
