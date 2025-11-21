@@ -37,7 +37,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'genoma'
+
+    # Django REST Framework para usar el ORM
+    'rest_framework',
+
+    # Microservicio
+    'genoma',
+
+    # Para agregar documentación con Swagger
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -78,7 +86,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'genosentinel',        # el nombre de tu BD
         'USER': 'root',                   # tu usuario
-        'PASSWORD': 'mc4A5T8d',        # tu password
+        'PASSWORD': '123456',        # tu password
         'HOST': 'localhost',
         'PORT': '3306',
         'OPTIONS': {

@@ -1,3 +1,3 @@
-from .gene import Gene
-from .variant import GeneticVariant
-from .report import PatientVariantReport
+from genoma.models.entities.gene import Gene
+from genoma.models.entities.variant import GeneticVariant
+from genoma.models.entities.report import PatientVariantReport
