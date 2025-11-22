@@ -16,9 +16,9 @@ import { ClinicalRecordsModule } from './modules/clinical-records/clinical-recor
       password: '123456',
       database: 'genosentinel',
       autoLoadEntities: true, // carga automática de entidades
-      synchronize: false,     // IMPORTANTE: ahora te explico esto
+      synchronize: false,    
       
-      logging: true, // ✅ AGREGAR ESTO para ver las queries SQL
+      logging: true, // para ver las queries SQL
     }),
     PatientsModule,
     TumorTypesModule,
