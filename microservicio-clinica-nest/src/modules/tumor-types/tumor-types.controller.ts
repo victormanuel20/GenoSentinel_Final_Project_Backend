@@ -133,32 +133,48 @@ export class TumorTypesController {
     }
 
 
-
-
-  /*
-  @Post()
-  create(@Body() createTumorTypeDto: CreateTumorTypeDto) {
-    return this.tumorTypesService.create(createTumorTypeDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.tumorTypesService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.tumorTypesService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTumorTypeDto: UpdateTumorTypeDto) {
-    return this.tumorTypesService.update(+id, updateTumorTypeDto);
-  }
-
+      // 5. ELIMINAR
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.tumorTypesService.remove(+id);
+  @ApiOperation({ summary: 'Eliminar un tipo de tumor' })
+  @ApiParam({ name: 'id', description: 'ID del tipo de tumor a eliminar', example: 4 })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Tipo de tumor eliminado exitosamente',
+    schema: {
+      example: {
+        message: 'Tipo de tumor con ID 4 eliminado exitosamente',
+        success: true
+      }
+    }
+  })
+  @ApiResponse({ 
+    status: 404, 
+    description: 'Tipo de tumor no encontrado',
+    schema: {
+      example: {
+        statusCode: 404,
+        message: 'Tipo de tumor con ID 999 no encontrado',
+        error: 'Not Found'
+      }
+    }
+  })
+  @ApiResponse({ 
+    status: 409, 
+    description: 'No se puede eliminar porque tiene historias clínicas asociadas',
+    schema: {
+      example: {
+        statusCode: 409,
+        message: 'No se puede eliminar el tipo de tumor con ID 1 porque tiene 1 historia(s) clínica(s) asociada(s)',
+        error: 'Conflict'
+      }
+    }
+  })
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<{ message: string; success: boolean }> {
+    return await this.tumorTypesService.remove(id);
   }
-    */
+
+
+
+
+
 }

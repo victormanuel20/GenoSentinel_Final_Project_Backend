@@ -11,4 +11,8 @@ export declare class TumorTypesService {
     findOne(id: number): Promise<TumorTypeResponseDto>;
     update(id: number, updateDto: UpdateTumorTypeDto): Promise<TumorTypeResponseDto>;
     private toResponseDto;
+    remove(id: number): Promise<{
+        message: string;
+        success: boolean;
+    }>;
 }

@@ -36,6 +36,9 @@ let TumorTypesController = class TumorTypesController {
     async update(id, updateDto) {
         return await this.tumorTypesService.update(id, updateDto);
     }
+    async remove(id) {
+        return await this.tumorTypesService.remove(id);
+    }
 };
 exports.TumorTypesController = TumorTypesController;
 __decorate([
@@ -156,6 +159,47 @@ __decorate([
     __metadata("design:paramtypes", [Number, update_tumor_type_dto_1.UpdateTumorTypeDto]),
     __metadata("design:returntype", Promise)
 ], TumorTypesController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Eliminar un tipo de tumor' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'ID del tipo de tumor a eliminar', example: 4 }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Tipo de tumor eliminado exitosamente',
+        schema: {
+            example: {
+                message: 'Tipo de tumor con ID 4 eliminado exitosamente',
+                success: true
+            }
+        }
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 404,
+        description: 'Tipo de tumor no encontrado',
+        schema: {
+            example: {
+                statusCode: 404,
+                message: 'Tipo de tumor con ID 999 no encontrado',
+                error: 'Not Found'
+            }
+        }
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 409,
+        description: 'No se puede eliminar porque tiene historias clínicas asociadas',
+        schema: {
+            example: {
+                statusCode: 409,
+                message: 'No se puede eliminar el tipo de tumor con ID 1 porque tiene 1 historia(s) clínica(s) asociada(s)',
+                error: 'Conflict'
+            }
+        }
+    }),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], TumorTypesController.prototype, "remove", null);
 exports.TumorTypesController = TumorTypesController = __decorate([
     (0, swagger_1.ApiTags)('Tipos de Tumor'),
     (0, common_1.Controller)('tumor-types'),

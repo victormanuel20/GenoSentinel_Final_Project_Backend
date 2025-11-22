@@ -8,8 +8,7 @@ import { TumorTypeResponseDto } from './dto/TumorTypeResponseDto';
 import { TumorTypeAlreadyExistsException } from './exceptions/TumorTypeAlreadyExistsException';
 import { TumorTypeNotFoundException } from './exceptions/TumorTypeNotFoundException';
 import { EmptyUpdateDataException } from './exceptions/EmptyUpdateDataException ';
-
-
+import { TumorTypeHasRecordsException } from './exceptions/TumorTypeHasRecordsException';
 
 @Injectable()
 export class TumorTypesService {
@@ -119,6 +118,33 @@ export class TumorTypesService {
       systemAffected: tumorType.systemAffected,
     };
   }
+
+
+  // 5. ELIMINAR TIPO DE TUMOR
+async remove(id: number): Promise<{ message: string; success: boolean }> {
+  // 1. Verificar que el tipo de tumor existe y cargar sus historias clínicas
+  const existingTumorType = await this.tumorTypeRepository.findOne({
+    where: { id },
+    relations: ['clinicalRecords'], // ← Cargar las historias clínicas asociadas
+  });
+
+  if (!existingTumorType) {
+    throw new TumorTypeNotFoundException(id);
+  }
+
+  // 2. Validar que NO tenga historias clínicas asociadas
+  if (existingTumorType.clinicalRecords && existingTumorType.clinicalRecords.length > 0) {
+    throw new TumorTypeHasRecordsException(id, existingTumorType.clinicalRecords.length);
+  }
+
+  // 3. Eliminar el tipo de tumor
+  await this.tumorTypeRepository.remove(existingTumorType);
+
+  return {
+    message: `Tipo de tumor con ID ${id} eliminado exitosamente`,
+    success: true,
+  };
+}
 
 
 

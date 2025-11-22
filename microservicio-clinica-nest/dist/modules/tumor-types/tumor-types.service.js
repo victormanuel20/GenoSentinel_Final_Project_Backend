@@ -20,6 +20,7 @@ const tumor_type_entity_1 = require("./entities/tumor-type.entity");
 const TumorTypeAlreadyExistsException_1 = require("./exceptions/TumorTypeAlreadyExistsException");
 const TumorTypeNotFoundException_1 = require("./exceptions/TumorTypeNotFoundException");
 const EmptyUpdateDataException_1 = require("./exceptions/EmptyUpdateDataException ");
+const TumorTypeHasRecordsException_1 = require("./exceptions/TumorTypeHasRecordsException");
 let TumorTypesService = class TumorTypesService {
     tumorTypeRepository;
     constructor(tumorTypeRepository) {
@@ -88,6 +89,23 @@ let TumorTypesService = class TumorTypesService {
             id: tumorType.id,
             name: tumorType.name,
             systemAffected: tumorType.systemAffected,
+        };
+    }
+    async remove(id) {
+        const existingTumorType = await this.tumorTypeRepository.findOne({
+            where: { id },
+            relations: ['clinicalRecords'],
+        });
+        if (!existingTumorType) {
+            throw new TumorTypeNotFoundException_1.TumorTypeNotFoundException(id);
+        }
+        if (existingTumorType.clinicalRecords && existingTumorType.clinicalRecords.length > 0) {
+            throw new TumorTypeHasRecordsException_1.TumorTypeHasRecordsException(id, existingTumorType.clinicalRecords.length);
+        }
+        await this.tumorTypeRepository.remove(existingTumorType);
+        return {
+            message: `Tipo de tumor con ID ${id} eliminado exitosamente`,
+            success: true,
         };
     }
 };

@@ -9,4 +9,8 @@ export declare class TumorTypesController {
     findAll(): Promise<TumorTypeResponseDto[]>;
     findOne(id: number): Promise<TumorTypeResponseDto>;
     update(id: number, updateDto: UpdateTumorTypeDto): Promise<TumorTypeResponseDto>;
+    remove(id: number): Promise<{
+        message: string;
+        success: boolean;
+    }>;
 }
