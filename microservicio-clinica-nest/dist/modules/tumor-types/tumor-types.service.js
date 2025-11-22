@@ -20,6 +20,10 @@ const tumor_type_entity_1 = require("./entities/tumor-type.entity");
 const TumorTypeAlreadyExistsException_1 = require("./exceptions/TumorTypeAlreadyExistsException");
 const TumorTypeNotFoundException_1 = require("./exceptions/TumorTypeNotFoundException");
 const EmptyUpdateDataException_1 = require("./exceptions/EmptyUpdateDataException ");
+const TumorTypeHasRecordsException_1 = require("./exceptions/TumorTypeHasRecordsException");
+const InvalidSearchParamsException_1 = require("./exceptions/InvalidSearchParamsException");
+const SearchNotFoundException_1 = require("./exceptions/SearchNotFoundException");
+const typeorm_3 = require("typeorm");
 let TumorTypesService = class TumorTypesService {
     tumorTypeRepository;
     constructor(tumorTypeRepository) {
@@ -89,6 +93,49 @@ let TumorTypesService = class TumorTypesService {
             name: tumorType.name,
             systemAffected: tumorType.systemAffected,
         };
+    }
+    async remove(id) {
+        const existingTumorType = await this.tumorTypeRepository.findOne({
+            where: { id },
+            relations: ['clinicalRecords'],
+        });
+        if (!existingTumorType) {
+            throw new TumorTypeNotFoundException_1.TumorTypeNotFoundException(id);
+        }
+        if (existingTumorType.clinicalRecords && existingTumorType.clinicalRecords.length > 0) {
+            throw new TumorTypeHasRecordsException_1.TumorTypeHasRecordsException(id, existingTumorType.clinicalRecords.length);
+        }
+        await this.tumorTypeRepository.remove(existingTumorType);
+        return {
+            message: `Tipo de tumor con ID ${id} eliminado exitosamente`,
+            success: true,
+        };
+    }
+    async search(searchDto) {
+        const searchData = {};
+        if (searchDto.name !== undefined && searchDto.name.trim() !== '') {
+            searchData.name = searchDto.name.trim();
+        }
+        if (searchDto.systemAffected !== undefined && searchDto.systemAffected.trim() !== '') {
+            searchData.systemAffected = searchDto.systemAffected.trim();
+        }
+        if (Object.keys(searchData).length === 0) {
+            throw new InvalidSearchParamsException_1.InvalidSearchParamsException();
+        }
+        const whereCondition = {};
+        if (searchData.name) {
+            whereCondition.name = (0, typeorm_3.Like)(`%${searchData.name}%`);
+        }
+        if (searchData.systemAffected) {
+            whereCondition.systemAffected = (0, typeorm_3.Like)(`%${searchData.systemAffected}%`);
+        }
+        const tumorTypes = await this.tumorTypeRepository.find({
+            where: whereCondition,
+        });
+        if (!tumorTypes || tumorTypes.length === 0) {
+            throw new SearchNotFoundException_1.SearchNotFoundException(searchDto);
+        }
+        return tumorTypes.map(tt => this.toResponseDto(tt));
     }
 };
 exports.TumorTypesService = TumorTypesService;
