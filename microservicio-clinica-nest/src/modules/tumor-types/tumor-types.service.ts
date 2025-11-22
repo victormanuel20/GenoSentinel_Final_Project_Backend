@@ -10,7 +10,7 @@ import { TumorTypeNotFoundException } from './exceptions/TumorTypeNotFoundExcept
 import { EmptyUpdateDataException } from './exceptions/EmptyUpdateDataException ';
 import { TumorTypeHasRecordsException } from './exceptions/TumorTypeHasRecordsException';
 import { InvalidSearchParamsException } from './exceptions/InvalidSearchParamsException';
-import { SearchNotFoundException } from './exceptions/SearchNotFoundEception';
+import { SearchNotFoundException } from './exceptions/SearchNotFoundException';
 import { SearchTumorTypeInDto } from './dto/SearchTumorTypeInDto';
 import { Like } from 'typeorm';
 
