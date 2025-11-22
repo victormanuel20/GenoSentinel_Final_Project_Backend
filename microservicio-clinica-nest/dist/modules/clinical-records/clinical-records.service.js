@@ -23,6 +23,8 @@ const clinical_record_not_found_exception_1 = require("./exceptions/clinical-rec
 const patient_not_found_for_record_exception_1 = require("./exceptions/patient-not-found-for-record.exception");
 const tumor_type_not_found_for_record_exception_1 = require("./exceptions/tumor-type-not-found-for-record.exception");
 const duplicate_clinical_record_exception_1 = require("./exceptions/duplicate-clinical-record.exception");
+const no_records_found_for_patient_exception_1 = require("./exceptions/no-records-found-for-patient.exception");
+const no_records_found_for_tumor_type_exception_1 = require("./exceptions/no-records-found-for-tumor-type.exception");
 let ClinicalRecordsService = class ClinicalRecordsService {
     clinicalRecordRepository;
     patientRepository;
@@ -84,6 +86,40 @@ let ClinicalRecordsService = class ClinicalRecordsService {
             throw new clinical_record_not_found_exception_1.ClinicalRecordNotFoundException(id);
         }
         return this.toOutDto(record);
+    }
+    async findByPatient(patientId) {
+        const patient = await this.patientRepository.findOne({
+            where: { id: patientId },
+        });
+        if (!patient) {
+            throw new patient_not_found_for_record_exception_1.PatientNotFoundForRecordException(patientId);
+        }
+        const records = await this.clinicalRecordRepository.find({
+            where: { patientId },
+            relations: ['patient', 'tumorType'],
+            order: { diagnosisDate: 'DESC' },
+        });
+        if (!records || records.length === 0) {
+            throw new no_records_found_for_patient_exception_1.NoRecordsFoundForPatientException(patientId);
+        }
+        return records.map(record => this.toOutDto(record));
+    }
+    async findByTumorType(tumorTypeId) {
+        const tumorType = await this.tumorTypeRepository.findOne({
+            where: { id: tumorTypeId },
+        });
+        if (!tumorType) {
+            throw new tumor_type_not_found_for_record_exception_1.TumorTypeNotFoundForRecordException(tumorTypeId);
+        }
+        const records = await this.clinicalRecordRepository.find({
+            where: { tumorTypeId },
+            relations: ['patient', 'tumorType'],
+            order: { diagnosisDate: 'DESC' },
+        });
+        if (!records || records.length === 0) {
+            throw new no_records_found_for_tumor_type_exception_1.NoRecordsFoundForTumorTypeException(tumorTypeId);
+        }
+        return records.map(record => this.toOutDto(record));
     }
     toOutDto(record) {
         return {

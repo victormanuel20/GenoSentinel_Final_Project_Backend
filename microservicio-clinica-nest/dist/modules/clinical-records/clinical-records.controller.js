@@ -29,6 +29,12 @@ let ClinicalRecordsController = class ClinicalRecordsController {
     async findAll() {
         return await this.clinicalRecordsService.findAll();
     }
+    async findByPatient(patientId) {
+        return await this.clinicalRecordsService.findByPatient(patientId);
+    }
+    async findByTumorType(tumorTypeId) {
+        return await this.clinicalRecordsService.findByTumorType(tumorTypeId);
+    }
     async findOne(id) {
         return await this.clinicalRecordsService.findOne(id);
     }
@@ -86,6 +92,28 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], ClinicalRecordsController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)('patient/:patientId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Obtener todas las historias clínicas de un paciente' }),
+    (0, swagger_1.ApiParam)({ name: 'patientId', description: 'ID del paciente', example: 1 }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Historias clínicas del paciente', type: [clinical_record_out_dto_1.ClinicalRecordOutDto] }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Paciente no encontrado o sin historias clínicas' }),
+    __param(0, (0, common_1.Param)('patientId', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], ClinicalRecordsController.prototype, "findByPatient", null);
+__decorate([
+    (0, common_1.Get)('tumor-type/:tumorTypeId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Obtener todas las historias clínicas de un tipo de tumor' }),
+    (0, swagger_1.ApiParam)({ name: 'tumorTypeId', description: 'ID del tipo de tumor', example: 1 }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Historias clínicas del tipo de tumor', type: [clinical_record_out_dto_1.ClinicalRecordOutDto] }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Tipo de tumor no encontrado o sin historias clínicas' }),
+    __param(0, (0, common_1.Param)('tumorTypeId', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], ClinicalRecordsController.prototype, "findByTumorType", null);
 __decorate([
     (0, common_1.Get)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Obtener una historia clínica por ID' }),

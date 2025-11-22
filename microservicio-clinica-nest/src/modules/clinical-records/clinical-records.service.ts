@@ -10,6 +10,8 @@ import { ClinicalRecordNotFoundException } from './exceptions/clinical-record-no
 import { PatientNotFoundForRecordException } from './exceptions/patient-not-found-for-record.exception';
 import { TumorTypeNotFoundForRecordException } from './exceptions/tumor-type-not-found-for-record.exception';
 import { DuplicateClinicalRecordException } from './exceptions/duplicate-clinical-record.exception';
+import { NoRecordsFoundForPatientException } from './exceptions/no-records-found-for-patient.exception';
+import { NoRecordsFoundForTumorTypeException } from './exceptions/no-records-found-for-tumor-type.exception';
 
 @Injectable()
 export class ClinicalRecordsService {
@@ -44,7 +46,7 @@ export class ClinicalRecordsService {
       throw new TumorTypeNotFoundForRecordException(createDto.tumorTypeId);
     }
 
-    // ✅ 3. NUEVA VALIDACIÓN: Verificar si ya existe un registro IDÉNTICO
+    // Verificar si ya existe un registro IDÉNTICO
     const existingRecord = await this.clinicalRecordRepository.findOne({
       where: {
         patientId: createDto.patientId,
@@ -82,7 +84,7 @@ export class ClinicalRecordsService {
     return this.toOutDto(recordWithRelations!);
   }
 
-  
+
   // 2. LISTAR TODAS
   async findAll(): Promise<ClinicalRecordOutDto[]> {
     const records = await this.clinicalRecordRepository.find({
@@ -105,6 +107,58 @@ export class ClinicalRecordsService {
 
     return this.toOutDto(record);
   }
+
+  // 4. OBTENER HISTORIAS CLÍNICAS DE UN PACIENTE
+async findByPatient(patientId: number): Promise<ClinicalRecordOutDto[]> {
+  // 1. Verificar que el paciente existe
+  const patient = await this.patientRepository.findOne({
+    where: { id: patientId },
+  });
+
+  if (!patient) {
+    throw new PatientNotFoundForRecordException(patientId);
+  }
+
+  // 2. Buscar todas las historias del paciente
+  const records = await this.clinicalRecordRepository.find({
+    where: { patientId },
+    relations: ['patient', 'tumorType'],
+    order: { diagnosisDate: 'DESC' }, // ← Más recientes primero
+  });
+
+  // 3. Si no tiene historias, lanzar excepción
+  if (!records || records.length === 0) {
+    throw new NoRecordsFoundForPatientException(patientId);
+  }
+
+  return records.map(record => this.toOutDto(record));
+}
+
+// 5. OBTENER HISTORIAS CLÍNICAS DE UN TIPO DE TUMOR
+async findByTumorType(tumorTypeId: number): Promise<ClinicalRecordOutDto[]> {
+  // 1. Verificar que el tipo de tumor existe
+  const tumorType = await this.tumorTypeRepository.findOne({
+    where: { id: tumorTypeId },
+  });
+
+  if (!tumorType) {
+    throw new TumorTypeNotFoundForRecordException(tumorTypeId);
+  }
+
+  // 2. Buscar todas las historias del tipo de tumor
+  const records = await this.clinicalRecordRepository.find({
+    where: { tumorTypeId },
+    relations: ['patient', 'tumorType'],
+    order: { diagnosisDate: 'DESC' }, // ← Más recientes primero
+  });
+
+  // 3. Si no tiene historias, lanzar excepción
+  if (!records || records.length === 0) {
+    throw new NoRecordsFoundForTumorTypeException(tumorTypeId);
+  }
+
+  return records.map(record => this.toOutDto(record));
+}
 
   // MÉTODO AUXILIAR: Convertir Entity a OutDto
   private toOutDto(record: ClinicalRecord): ClinicalRecordOutDto {
@@ -132,27 +186,4 @@ export class ClinicalRecordsService {
   
   
 
-
-  /*
-  create(createClinicalRecordDto: CreateClinicalRecordInDto) {
-    return 'This action adds a new clinicalRecord';
-  }
-
-  findAll() {
-    return `This action returns all clinicalRecords`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} clinicalRecord`;
-  }
-
-  update(id: number, updateClinicalRecordDto: UpdateClinicalRecordDto) {
-    return `This action updates a #${id} clinicalRecord`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} clinicalRecord`;
-  }
-
-  */
 }

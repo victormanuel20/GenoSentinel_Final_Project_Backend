@@ -12,5 +12,7 @@ export declare class ClinicalRecordsService {
     create(createDto: CreateClinicalRecordInDto): Promise<ClinicalRecordOutDto>;
     findAll(): Promise<ClinicalRecordOutDto[]>;
     findOne(id: number): Promise<ClinicalRecordOutDto>;
+    findByPatient(patientId: number): Promise<ClinicalRecordOutDto[]>;
+    findByTumorType(tumorTypeId: number): Promise<ClinicalRecordOutDto[]>;
     private toOutDto;
 }

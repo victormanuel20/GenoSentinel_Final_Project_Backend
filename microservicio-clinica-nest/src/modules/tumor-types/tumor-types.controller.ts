@@ -42,7 +42,7 @@ export class TumorTypesController {
     return await this.tumorTypesService.findAll();
   }
 
-    // 7. BUSCAR POR CRITERIOS (debe ir ANTES de /:id)
+    // 7. BUSCAR POR CRITERIOS (
   @Get('search')
   @ApiOperation({ summary: 'Buscar tipos de tumor por nombre o sistema afectado' })
   @ApiQuery({ name: 'name', required: false, description: 'Nombre del tipo de tumor (búsqueda parcial)' })

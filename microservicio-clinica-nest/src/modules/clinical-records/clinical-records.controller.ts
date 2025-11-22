@@ -62,7 +62,27 @@ export class ClinicalRecordsController {
     return await this.clinicalRecordsService.findAll();
   }
 
-  // 3. BUSCAR HISTORIA CLÍNICA POR ID
+   // ✅ 3. AGREGAR ESTE (historias de un paciente)
+  @Get('patient/:patientId')
+  @ApiOperation({ summary: 'Obtener todas las historias clínicas de un paciente' })
+  @ApiParam({ name: 'patientId', description: 'ID del paciente', example: 1 })
+  @ApiResponse({ status: 200, description: 'Historias clínicas del paciente', type: [ClinicalRecordOutDto] })
+  @ApiResponse({ status: 404, description: 'Paciente no encontrado o sin historias clínicas' })
+  async findByPatient(@Param('patientId', ParseIntPipe) patientId: number): Promise<ClinicalRecordOutDto[]> {
+    return await this.clinicalRecordsService.findByPatient(patientId);
+  }
+
+  // ✅ 4. AGREGAR ESTE (historias de un tipo de tumor)
+  @Get('tumor-type/:tumorTypeId')
+  @ApiOperation({ summary: 'Obtener todas las historias clínicas de un tipo de tumor' })
+  @ApiParam({ name: 'tumorTypeId', description: 'ID del tipo de tumor', example: 1 })
+  @ApiResponse({ status: 200, description: 'Historias clínicas del tipo de tumor', type: [ClinicalRecordOutDto] })
+  @ApiResponse({ status: 404, description: 'Tipo de tumor no encontrado o sin historias clínicas' })
+  async findByTumorType(@Param('tumorTypeId', ParseIntPipe) tumorTypeId: number): Promise<ClinicalRecordOutDto[]> {
+    return await this.clinicalRecordsService.findByTumorType(tumorTypeId);
+  }
+
+  // 4. BUSCAR HISTORIA CLÍNICA POR ID
   @Get(':id')
   @ApiOperation({ summary: 'Obtener una historia clínica por ID' })
   @ApiParam({ name: 'id', description: 'ID de la historia clínica', example: 1 })
