@@ -7,6 +7,11 @@ from genoma.models.DTOs.gene_dto import GeneDTO
 from genoma.models.DTOs.create_gene_dto import CreateGeneDTO
 from genoma.models.DTOs.update_gene_dto import UpdateGeneDTO
 
+# Excepciones personalizadas
+from genoma.exceptions.not_found_exception import NotFoundException
+from genoma.exceptions.bad_request_exception import BadRequestException
+from genoma.exceptions.base_exception import BaseAPIException
+
 
 def get_all_genes(request):
     # GET /genes/
@@ -24,7 +29,7 @@ def get_gene_by_id(request, gene_id):
     try:
         gene = Gene.objects.get(id=gene_id)
     except Gene.DoesNotExist:
-        return JsonResponse({"error": "Gene not found"}, status=404)
+        raise NotFoundException("Gene not found")
 
     dto = GeneDTO.from_model(gene).to_dict()
     return JsonResponse(dto, status=200)
@@ -36,7 +41,7 @@ def search_gene_by_symbol(request):
     symbol = request.GET.get("symbol", "")
 
     if symbol == "":
-        return JsonResponse({"error": "Symbol query parameter is required"}, status=400)
+        raise BadRequestException("Symbol query parameter is required")
 
     genes = Gene.objects.filter(symbol__icontains=symbol)
 
@@ -50,15 +55,15 @@ def create_gene(request):
     # POST /genes/
     # Crea un nuevo gen.
     if request.method != "POST":
-        return JsonResponse({"error": "Method not allowed"}, status=405)
+        raise BadRequestException("Method not allowed")
 
     try:
         data = json.loads(request.body)
         dto = CreateGeneDTO(data)
     except ValueError as ve:
-        return JsonResponse({"errors": ve.args[0]}, status=400)
+        raise BadRequestException(ve.args[0])
     except Exception:
-        return JsonResponse({"error": "Invalid JSON format"}, status=400)
+        raise BadRequestException("Invalid JSON format")
 
     gene = Gene.objects.create(
         symbol=dto.symbol,
@@ -74,20 +79,20 @@ def update_gene(request, gene_id):
     # PUT /genes/<id>/
     # Actualiza un gen existente.
     if request.method != "PUT":
-        return JsonResponse({"error": "Method not allowed"}, status=405)
+        raise BadRequestException("Method not allowed")
 
     try:
         gene = Gene.objects.get(id=gene_id)
     except Gene.DoesNotExist:
-        return JsonResponse({"error": "Gene not found"}, status=404)
+        raise NotFoundException("Gene not found")
 
     try:
         data = json.loads(request.body)
         dto = UpdateGeneDTO(data)
     except ValueError as ve:
-        return JsonResponse({"errors": ve.args[0]}, status=400)
+        raise BadRequestException(ve.args[0])
     except Exception:
-        return JsonResponse({"error": "Invalid JSON format"}, status=400)
+        raise BadRequestException("Invalid JSON format")
 
     gene.symbol = dto.symbol
     gene.full_name = dto.full_name
@@ -102,12 +107,12 @@ def delete_gene(request, gene_id):
     # DELETE /genes/<id>/
     # Elimina un gen.
     if request.method != "DELETE":
-        return JsonResponse({"error": "Method not allowed"}, status=405)
+        raise BadRequestException("Method not allowed")
 
     try:
         gene = Gene.objects.get(id=gene_id)
     except Gene.DoesNotExist:
-        return JsonResponse({"error": "Gene not found"}, status=404)
+        raise NotFoundException("Gene not found")
 
     gene.delete()
 
