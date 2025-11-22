@@ -2,11 +2,13 @@ import { TumorTypesService } from './tumor-types.service';
 import { TumorTypeResponseDto } from './dto/TumorTypeResponseDto';
 import { CreateTumorTypeDto } from './dto/create-tumor-type.dto';
 import { UpdateTumorTypeDto } from './dto/update-tumor-type.dto';
+import { SearchTumorTypeInDto } from './dto/SearchTumorTypeInDto';
 export declare class TumorTypesController {
     private readonly tumorTypesService;
     constructor(tumorTypesService: TumorTypesService);
     create(createDto: CreateTumorTypeDto): Promise<TumorTypeResponseDto>;
     findAll(): Promise<TumorTypeResponseDto[]>;
+    search(searchDto: SearchTumorTypeInDto): Promise<TumorTypeResponseDto[]>;
     findOne(id: number): Promise<TumorTypeResponseDto>;
     update(id: number, updateDto: UpdateTumorTypeDto): Promise<TumorTypeResponseDto>;
     remove(id: number): Promise<{

@@ -9,6 +9,11 @@ import { TumorTypeAlreadyExistsException } from './exceptions/TumorTypeAlreadyEx
 import { TumorTypeNotFoundException } from './exceptions/TumorTypeNotFoundException';
 import { EmptyUpdateDataException } from './exceptions/EmptyUpdateDataException ';
 import { TumorTypeHasRecordsException } from './exceptions/TumorTypeHasRecordsException';
+import { InvalidSearchParamsException } from './exceptions/InvalidSearchParamsException';
+import { SearchNotFoundException } from './exceptions/SearchNotFoundEception';
+import { SearchTumorTypeInDto } from './dto/SearchTumorTypeInDto';
+import { Like } from 'typeorm';
+
 
 @Injectable()
 export class TumorTypesService {
@@ -147,28 +152,49 @@ async remove(id: number): Promise<{ message: string; success: boolean }> {
 }
 
 
+// 7. BUSCAR POR CRITERIOS
+async search(searchDto: SearchTumorTypeInDto): Promise<TumorTypeResponseDto[]> {
+  // 1. Construir objeto con solo los campos que tienen valor
+  const searchData: any = {};
 
-
-  /*
-  create(createTumorTypeDto: CreateTumorTypeDto) {
-    return 'This action adds a new tumorType';
+  if (searchDto.name !== undefined && searchDto.name.trim() !== '') {
+    searchData.name = searchDto.name.trim();
   }
 
-  findAll() {
-    return `This action returns all tumorTypes`;
+  if (searchDto.systemAffected !== undefined && searchDto.systemAffected.trim() !== '') {
+    searchData.systemAffected = searchDto.systemAffected.trim();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} tumorType`;
+  // 2. Validar que hay al menos un criterio
+  if (Object.keys(searchData).length === 0) {
+    throw new InvalidSearchParamsException();
   }
 
-  update(id: number, updateTumorTypeDto: UpdateTumorTypeDto) {
-    return `This action updates a #${id} tumorType`;
+  // 3. Construir query con búsqueda parcial (LIKE)
+  const whereCondition: any = {};
+
+  if (searchData.name) {
+    whereCondition.name = Like(`%${searchData.name}%`);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} tumorType`;
+  if (searchData.systemAffected) {
+    whereCondition.systemAffected = Like(`%${searchData.systemAffected}%`);
   }
 
-  */
+  // 4. Buscar en la BD
+  const tumorTypes = await this.tumorTypeRepository.find({
+    where: whereCondition,
+  });
+
+  // 5. Si no hay resultados → 404
+  if (!tumorTypes || tumorTypes.length === 0) {
+    throw new SearchNotFoundException(searchDto);
+  }
+
+  return tumorTypes.map(tt => this.toResponseDto(tt));
+}
+
+
+
+ 
 }

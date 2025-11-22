@@ -3,6 +3,7 @@ import { CreateTumorTypeDto } from './dto/create-tumor-type.dto';
 import { UpdateTumorTypeDto } from './dto/update-tumor-type.dto';
 import { TumorType } from './entities/tumor-type.entity';
 import { TumorTypeResponseDto } from './dto/TumorTypeResponseDto';
+import { SearchTumorTypeInDto } from './dto/SearchTumorTypeInDto';
 export declare class TumorTypesService {
     private readonly tumorTypeRepository;
     constructor(tumorTypeRepository: Repository<TumorType>);
@@ -15,4 +16,5 @@ export declare class TumorTypesService {
         message: string;
         success: boolean;
     }>;
+    search(searchDto: SearchTumorTypeInDto): Promise<TumorTypeResponseDto[]>;
 }

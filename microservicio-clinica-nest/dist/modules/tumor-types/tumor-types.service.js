@@ -21,6 +21,9 @@ const TumorTypeAlreadyExistsException_1 = require("./exceptions/TumorTypeAlready
 const TumorTypeNotFoundException_1 = require("./exceptions/TumorTypeNotFoundException");
 const EmptyUpdateDataException_1 = require("./exceptions/EmptyUpdateDataException ");
 const TumorTypeHasRecordsException_1 = require("./exceptions/TumorTypeHasRecordsException");
+const InvalidSearchParamsException_1 = require("./exceptions/InvalidSearchParamsException");
+const SearchNotFoundEception_1 = require("./exceptions/SearchNotFoundEception");
+const typeorm_3 = require("typeorm");
 let TumorTypesService = class TumorTypesService {
     tumorTypeRepository;
     constructor(tumorTypeRepository) {
@@ -107,6 +110,32 @@ let TumorTypesService = class TumorTypesService {
             message: `Tipo de tumor con ID ${id} eliminado exitosamente`,
             success: true,
         };
+    }
+    async search(searchDto) {
+        const searchData = {};
+        if (searchDto.name !== undefined && searchDto.name.trim() !== '') {
+            searchData.name = searchDto.name.trim();
+        }
+        if (searchDto.systemAffected !== undefined && searchDto.systemAffected.trim() !== '') {
+            searchData.systemAffected = searchDto.systemAffected.trim();
+        }
+        if (Object.keys(searchData).length === 0) {
+            throw new InvalidSearchParamsException_1.InvalidSearchParamsException();
+        }
+        const whereCondition = {};
+        if (searchData.name) {
+            whereCondition.name = (0, typeorm_3.Like)(`%${searchData.name}%`);
+        }
+        if (searchData.systemAffected) {
+            whereCondition.systemAffected = (0, typeorm_3.Like)(`%${searchData.systemAffected}%`);
+        }
+        const tumorTypes = await this.tumorTypeRepository.find({
+            where: whereCondition,
+        });
+        if (!tumorTypes || tumorTypes.length === 0) {
+            throw new SearchNotFoundEception_1.SearchNotFoundException(searchDto);
+        }
+        return tumorTypes.map(tt => this.toResponseDto(tt));
     }
 };
 exports.TumorTypesService = TumorTypesService;
