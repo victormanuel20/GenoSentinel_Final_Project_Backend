@@ -22,6 +22,7 @@ const tumor_type_entity_1 = require("../tumor-types/entities/tumor-type.entity")
 const clinical_record_not_found_exception_1 = require("./exceptions/clinical-record-not-found.exception");
 const patient_not_found_for_record_exception_1 = require("./exceptions/patient-not-found-for-record.exception");
 const tumor_type_not_found_for_record_exception_1 = require("./exceptions/tumor-type-not-found-for-record.exception");
+const duplicate_clinical_record_exception_1 = require("./exceptions/duplicate-clinical-record.exception");
 let ClinicalRecordsService = class ClinicalRecordsService {
     clinicalRecordRepository;
     patientRepository;
@@ -43,6 +44,16 @@ let ClinicalRecordsService = class ClinicalRecordsService {
         });
         if (!tumorType) {
             throw new tumor_type_not_found_for_record_exception_1.TumorTypeNotFoundForRecordException(createDto.tumorTypeId);
+        }
+        const existingRecord = await this.clinicalRecordRepository.findOne({
+            where: {
+                patientId: createDto.patientId,
+                tumorTypeId: createDto.tumorTypeId,
+                diagnosisDate: createDto.diagnosisDate,
+            },
+        });
+        if (existingRecord) {
+            throw new duplicate_clinical_record_exception_1.DuplicateClinicalRecordException(createDto.patientId, createDto.tumorTypeId, createDto.diagnosisDate);
         }
         const clinicalRecord = this.clinicalRecordRepository.create({
             patientId: createDto.patientId,

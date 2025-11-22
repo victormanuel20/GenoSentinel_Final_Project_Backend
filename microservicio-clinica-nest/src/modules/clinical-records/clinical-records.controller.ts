@@ -41,6 +41,11 @@ export class ClinicalRecordsController {
       }
     }
   })
+  @ApiResponse({ 
+    status: 409, 
+    description: 'Ya existe una historia clínica idéntica',
+  })
+
   async create(@Body() createDto: CreateClinicalRecordInDto): Promise<ClinicalRecordOutDto> {
     return await this.clinicalRecordsService.create(createDto);
   }

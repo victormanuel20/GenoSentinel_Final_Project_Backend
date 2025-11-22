@@ -65,6 +65,10 @@ __decorate([
             }
         }
     }),
+    (0, swagger_1.ApiResponse)({
+        status: 409,
+        description: 'Ya existe una historia clínica idéntica',
+    }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_clinical_record_in_dto_1.CreateClinicalRecordInDto]),

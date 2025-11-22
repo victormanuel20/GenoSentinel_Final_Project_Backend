@@ -9,6 +9,7 @@ import { ClinicalRecordOutDto } from './dto/clinical-record-out.dto';
 import { ClinicalRecordNotFoundException } from './exceptions/clinical-record-not-found.exception';
 import { PatientNotFoundForRecordException } from './exceptions/patient-not-found-for-record.exception';
 import { TumorTypeNotFoundForRecordException } from './exceptions/tumor-type-not-found-for-record.exception';
+import { DuplicateClinicalRecordException } from './exceptions/duplicate-clinical-record.exception';
 
 @Injectable()
 export class ClinicalRecordsService {
@@ -24,27 +25,43 @@ export class ClinicalRecordsService {
     private readonly tumorTypeRepository: Repository<TumorType>, // ← Inyectas el Repository
   ) {}
 
-  // 1. CREAR HISTORIA CLÍNICA
-  async create(createDto: CreateClinicalRecordInDto): Promise<ClinicalRecordOutDto> {
-    // 1.1 Validar que el paciente existe
+    async create(createDto: CreateClinicalRecordInDto): Promise<ClinicalRecordOutDto> {
+    // 1. Validar que el paciente existe
     const patient = await this.patientRepository.findOne({
       where: { id: createDto.patientId },
     });
 
     if (!patient) {
-      throw new PatientNotFoundForRecordException(createDto.patientId); // ← PASAR EL ID
+      throw new PatientNotFoundForRecordException(createDto.patientId);
     }
 
-    // 1.2 Validar que el tipo de tumor existe
+    // 2. Validar que el tipo de tumor existe
     const tumorType = await this.tumorTypeRepository.findOne({
       where: { id: createDto.tumorTypeId },
     });
 
     if (!tumorType) {
-      throw new TumorTypeNotFoundForRecordException(createDto.tumorTypeId); // ← PASAR EL ID
+      throw new TumorTypeNotFoundForRecordException(createDto.tumorTypeId);
     }
 
-    // 1.3 Crear la historia clínica
+    // ✅ 3. NUEVA VALIDACIÓN: Verificar si ya existe un registro IDÉNTICO
+    const existingRecord = await this.clinicalRecordRepository.findOne({
+      where: {
+        patientId: createDto.patientId,
+        tumorTypeId: createDto.tumorTypeId,
+        diagnosisDate: createDto.diagnosisDate,
+      },
+    });
+
+    if (existingRecord) {
+      throw new DuplicateClinicalRecordException(
+        createDto.patientId,
+        createDto.tumorTypeId,
+        createDto.diagnosisDate
+      );
+    }
+
+    // 4. Crear la historia clínica
     const clinicalRecord = this.clinicalRecordRepository.create({
       patientId: createDto.patientId,
       tumorTypeId: createDto.tumorTypeId,
@@ -53,10 +70,10 @@ export class ClinicalRecordsService {
       treatmentProtocol: createDto.treatmentProtocol,
     });
 
-    // 1.4 Guardar
+    // 5. Guardar
     const savedRecord = await this.clinicalRecordRepository.save(clinicalRecord);
 
-    // 1.5 Cargar las relaciones para la respuesta
+    // 6. Cargar las relaciones
     const recordWithRelations = await this.clinicalRecordRepository.findOne({
       where: { id: savedRecord.id },
       relations: ['patient', 'tumorType'],
@@ -65,6 +82,7 @@ export class ClinicalRecordsService {
     return this.toOutDto(recordWithRelations!);
   }
 
+  
   // 2. LISTAR TODAS
   async findAll(): Promise<ClinicalRecordOutDto[]> {
     const records = await this.clinicalRecordRepository.find({
