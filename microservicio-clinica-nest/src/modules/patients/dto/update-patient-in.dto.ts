@@ -1,10 +1,10 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { CreatePatientDto } from './create-patient.dto';
+import { CreatePatientInDto } from './create-patient-in.dto';
 import { IsEnum, IsOptional, IsString, IsDateString } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Gender, PatientStatus } from '../entities/patient.entity';
 
-export class UpdatePatientDto extends PartialType(CreatePatientDto) {
+export class UpdatePatientInDto extends PartialType(CreatePatientInDto) {
   @ApiPropertyOptional({ 
     example: 'Juan',
     description: 'Nombre(s) del paciente',

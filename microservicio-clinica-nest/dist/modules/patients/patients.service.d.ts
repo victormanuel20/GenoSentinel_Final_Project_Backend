@@ -1,18 +1,18 @@
 import { Repository } from 'typeorm';
 import { Patient } from './entities/patient.entity';
 import { PatientResponseOutDto } from './dto/patient-response-out.dto';
-import { CreatePatientDto } from './dto/create-patient.dto';
-import { SearchPatientDto } from './dto/search-patient.dto';
-import { UpdatePatientDto } from './dto/update-patient.dto';
-import { DesactivatePatientDto } from './dto/DesactivatePatientDto';
+import { CreatePatientInDto } from './dto/create-patient-in.dto';
+import { SearchPatientInDto } from './dto/search-patient-in.dto';
+import { UpdatePatientInDto } from './dto/update-patient-in.dto';
+import { DesactivatePatientInDto } from './dto/DesactivatePatient-in.Dto';
 export declare class PatientsService {
     private readonly patientRepository;
     constructor(patientRepository: Repository<Patient>);
     findAll(): Promise<PatientResponseOutDto[]>;
     findOne(id: number): Promise<PatientResponseOutDto>;
-    search(searchDto: SearchPatientDto): Promise<PatientResponseOutDto[]>;
-    create(createPatientDto: CreatePatientDto): Promise<PatientResponseOutDto>;
+    search(searchDto: SearchPatientInDto): Promise<PatientResponseOutDto[]>;
+    create(createPatientDto: CreatePatientInDto): Promise<PatientResponseOutDto>;
     private toResponseDto;
-    update(id: number, updatePatientDto: UpdatePatientDto): Promise<PatientResponseOutDto>;
-    desactivate(id: number, deactivatePatientDto: DesactivatePatientDto): Promise<PatientResponseOutDto>;
+    update(id: number, updatePatientDto: UpdatePatientInDto): Promise<PatientResponseOutDto>;
+    desactivate(id: number, deactivatePatientDto: DesactivatePatientInDto): Promise<PatientResponseOutDto>;
 }

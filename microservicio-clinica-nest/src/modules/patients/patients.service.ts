@@ -2,10 +2,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { Patient } from './entities/patient.entity';
 import { PatientResponseOutDto } from './dto/patient-response-out.dto';
-import { CreatePatientDto } from './dto/create-patient.dto';
-import { SearchPatientDto } from './dto/search-patient.dto';
-import { UpdatePatientDto } from './dto/update-patient.dto';
-import { DesactivatePatientDto } from './dto/DesactivatePatientDto';
+import { CreatePatientInDto } from './dto/create-patient-in.dto';
+import { SearchPatientInDto } from './dto/search-patient-in.dto';
+import { UpdatePatientInDto } from './dto/update-patient-in.dto';
+import { DesactivatePatientInDto } from './dto/DesactivatePatient-in.Dto';
 import { ConflictException, Injectable } from '@nestjs/common';
 import { PatientAlreadyExistsException } from './exceptions/PatientAlreadyExistsException';
 import { PatientNotFoundException } from './exceptions/patient-not-found.exception';
@@ -51,7 +51,7 @@ export class PatientsService {
   }
 
   // BUSCAR POR CRITERIOS (nombre, apellido, fecha)
-  async search(searchDto: SearchPatientDto): Promise<PatientResponseOutDto[]> {
+  async search(searchDto: SearchPatientInDto): Promise<PatientResponseOutDto[]> {
     // Validar que al menos un criterio esté presente
     if (!searchDto.firstName && !searchDto.lastName && !searchDto.birthDate) {
       throw new InvalidSearchParamsException();
@@ -86,7 +86,7 @@ export class PatientsService {
   }
 
 
-  async create(createPatientDto: CreatePatientDto): Promise<PatientResponseOutDto> {
+  async create(createPatientDto: CreatePatientInDto): Promise<PatientResponseOutDto> {
     // 1. Buscar pacientes con el mismo nombre Y fecha
     const existingPatient = await this.patientRepository.findOne({
       where: {
@@ -147,7 +147,7 @@ export class PatientsService {
   }
 
 
-  async update(id: number, updatePatientDto: UpdatePatientDto): Promise<PatientResponseOutDto> {
+  async update(id: number, updatePatientDto: UpdatePatientInDto): Promise<PatientResponseOutDto> {
   // 1. Verificar que el paciente existe
   const existingPatient = await this.patientRepository.findOne({
     where: { id },
@@ -198,7 +198,7 @@ if (updatePatientDto.firstName || updatePatientDto.lastName || updatePatientDto.
 }
 
 //Desactivar paciente 
-async desactivate(id: number, deactivatePatientDto: DesactivatePatientDto): Promise<PatientResponseOutDto> {
+async desactivate(id: number, deactivatePatientDto: DesactivatePatientInDto): Promise<PatientResponseOutDto> {
   // 1. Verificar que el paciente existe
   const existingPatient = await this.patientRepository.findOne({
     where: { id },

@@ -213,7 +213,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ClinicalRecordsController.prototype, "update", null);
 exports.ClinicalRecordsController = ClinicalRecordsController = __decorate([
-    (0, swagger_1.ApiTags)('Historias clinicas'),
+    (0, swagger_1.ApiTags)('Historias Clínicas'),
     (0, common_1.Controller)('clinical-records'),
     __metadata("design:paramtypes", [clinical_records_service_1.ClinicalRecordsService])
 ], ClinicalRecordsController);

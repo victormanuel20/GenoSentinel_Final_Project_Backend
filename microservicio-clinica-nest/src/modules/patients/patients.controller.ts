@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete,HttpCode, HttpStatus,Query,ParseIntPipe } from '@nestjs/common';
 import { PatientsService } from './patients.service';
-import { CreatePatientDto } from './dto/create-patient.dto';
-import { UpdatePatientDto } from './dto/update-patient.dto';
+import { CreatePatientInDto } from './dto/create-patient-in.dto';
+import { UpdatePatientInDto } from './dto/update-patient-in.dto';
 import { PatientResponseOutDto } from './dto/patient-response-out.dto';
-import { SearchPatientDto } from './dto/search-patient.dto';
+import { SearchPatientInDto } from './dto/search-patient-in.dto';
 import { ApiTags, ApiOperation, ApiResponse,ApiParam, ApiQuery } from '@nestjs/swagger';
-import { DesactivatePatientDto } from './dto/DesactivatePatientDto';
+import { DesactivatePatientInDto } from './dto/DesactivatePatient-in.Dto';
 
 
 
@@ -45,7 +45,7 @@ export class PatientsController {
   status: 404,
   description: 'No se encontraron pacientes con los criterios proporcionados',
   })
-  async search(@Query() searchDto: SearchPatientDto): Promise<PatientResponseOutDto[]> {
+  async search(@Query() searchDto: SearchPatientInDto): Promise<PatientResponseOutDto[]> {
     return await this.patientsService.search(searchDto);
   }
 
@@ -104,7 +104,7 @@ export class PatientsController {
       }
     }
   })
-  async create(@Body() createPatientDto: CreatePatientDto): Promise<PatientResponseOutDto> {
+  async create(@Body() createPatientDto: CreatePatientInDto): Promise<PatientResponseOutDto> {
     return await this.patientsService.create(createPatientDto);
   }
 
@@ -163,7 +163,7 @@ export class PatientsController {
   })
   async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updatePatientDto: UpdatePatientDto,
+    @Body() updatePatientDto: UpdatePatientInDto,
   ): Promise<PatientResponseOutDto> {
     return await this.patientsService.update(id, updatePatientDto);
   }
@@ -211,7 +211,7 @@ export class PatientsController {
 })
 async desactivate(
   @Param('id', ParseIntPipe) id: number,
-  @Body() deactivatePatientDto: DesactivatePatientDto, 
+  @Body() deactivatePatientDto: DesactivatePatientInDto, 
 ): Promise<PatientResponseOutDto> {
   return await this.patientsService.desactivate(id, deactivatePatientDto);
 }

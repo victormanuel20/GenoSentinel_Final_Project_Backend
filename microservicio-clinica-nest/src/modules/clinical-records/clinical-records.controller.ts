@@ -6,7 +6,7 @@ import { CreateClinicalRecordInDto } from './dto/create-clinical-record-in.dto';
 import { ClinicalRecordOutDto } from './dto/clinical-record-out.dto';
 import { UpdateClinicalRecordInDto } from './dto/update-clinical-record-in.dto';
 
-@ApiTags('Historias clinicas')
+@ApiTags('Historias Clínicas')
 @Controller('clinical-records')
 export class ClinicalRecordsController {
   constructor(private readonly clinicalRecordsService: ClinicalRecordsService) {}

@@ -15,12 +15,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PatientsController = void 0;
 const common_1 = require("@nestjs/common");
 const patients_service_1 = require("./patients.service");
-const create_patient_dto_1 = require("./dto/create-patient.dto");
-const update_patient_dto_1 = require("./dto/update-patient.dto");
+const create_patient_in_dto_1 = require("./dto/create-patient-in.dto");
+const update_patient_in_dto_1 = require("./dto/update-patient-in.dto");
 const patient_response_out_dto_1 = require("./dto/patient-response-out.dto");
-const search_patient_dto_1 = require("./dto/search-patient.dto");
+const search_patient_in_dto_1 = require("./dto/search-patient-in.dto");
 const swagger_1 = require("@nestjs/swagger");
-const DesactivatePatientDto_1 = require("./dto/DesactivatePatientDto");
+const DesactivatePatient_in_Dto_1 = require("./dto/DesactivatePatient-in.Dto");
 let PatientsController = class PatientsController {
     patientsService;
     constructor(patientsService) {
@@ -79,7 +79,7 @@ __decorate([
     }),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [search_patient_dto_1.SearchPatientDto]),
+    __metadata("design:paramtypes", [search_patient_in_dto_1.SearchPatientInDto]),
     __metadata("design:returntype", Promise)
 ], PatientsController.prototype, "search", null);
 __decorate([
@@ -140,7 +140,7 @@ __decorate([
     }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_patient_dto_1.CreatePatientDto]),
+    __metadata("design:paramtypes", [create_patient_in_dto_1.CreatePatientInDto]),
     __metadata("design:returntype", Promise)
 ], PatientsController.prototype, "create", null);
 __decorate([
@@ -198,7 +198,7 @@ __decorate([
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, update_patient_dto_1.UpdatePatientDto]),
+    __metadata("design:paramtypes", [Number, update_patient_in_dto_1.UpdatePatientInDto]),
     __metadata("design:returntype", Promise)
 ], PatientsController.prototype, "update", null);
 __decorate([
@@ -245,7 +245,7 @@ __decorate([
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, DesactivatePatientDto_1.DesactivatePatientDto]),
+    __metadata("design:paramtypes", [Number, DesactivatePatient_in_Dto_1.DesactivatePatientInDto]),
     __metadata("design:returntype", Promise)
 ], PatientsController.prototype, "desactivate", null);
 exports.PatientsController = PatientsController = __decorate([

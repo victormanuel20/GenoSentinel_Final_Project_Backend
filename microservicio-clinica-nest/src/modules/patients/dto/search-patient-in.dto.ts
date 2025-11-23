@@ -1,7 +1,7 @@
 import { IsString, IsOptional, IsDateString } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
-export class SearchPatientDto {
+export class SearchPatientInDto {
   @ApiPropertyOptional({ 
     example: 'Ana',
     description: 'Nombre del paciente (búsqueda parcial)',

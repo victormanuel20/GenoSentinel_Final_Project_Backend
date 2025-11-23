@@ -2,7 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
 import { PatientStatus } from '../entities/patient.entity';
 
-export class DesactivatePatientDto{
+export class DesactivatePatientInDto{
   @ApiProperty({ 
     enum: PatientStatus,
     example: PatientStatus.INACTIVO,

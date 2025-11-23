@@ -1,8 +1,8 @@
 import { NotFoundException } from '@nestjs/common';
-import { SearchPatientDto } from '../dto/search-patient.dto';
+import { SearchPatientInDto } from '../dto/search-patient-in.dto';
 
 export class PatientsNotFoundException extends NotFoundException {
-  constructor(filters: SearchPatientDto) {
+  constructor(filters: SearchPatientInDto) {
     const parts: string[] = [];
 
     if (filters.firstName) parts.push(`nombre="${filters.firstName}"`);
