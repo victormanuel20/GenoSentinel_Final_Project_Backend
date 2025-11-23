@@ -16,9 +16,9 @@ exports.TumorTypesController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const tumor_types_service_1 = require("./tumor-types.service");
-const TumorTypeResponseDto_1 = require("./dto/TumorTypeResponseDto");
-const create_tumor_type_dto_1 = require("./dto/create-tumor-type.dto");
-const update_tumor_type_dto_1 = require("./dto/update-tumor-type.dto");
+const TumorTypeResponse_outDto_1 = require("./dto/TumorTypeResponse-outDto");
+const create_tumor_type_in_dto_1 = require("./dto/create-tumor-type-in.dto");
+const update_tumor_type_in_dto_1 = require("./dto/update-tumor-type-in.dto");
 const SearchTumorTypeInDto_1 = require("./dto/SearchTumorTypeInDto");
 const common_2 = require("@nestjs/common");
 let TumorTypesController = class TumorTypesController {
@@ -53,7 +53,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({
         status: 201,
         description: 'Tipo de tumor creado exitosamente',
-        type: TumorTypeResponseDto_1.TumorTypeResponseDto,
+        type: TumorTypeResponse_outDto_1.TumorTypeResponseOutDto,
     }),
     (0, swagger_1.ApiResponse)({
         status: 409,
@@ -61,7 +61,7 @@ __decorate([
     }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_tumor_type_dto_1.CreateTumorTypeDto]),
+    __metadata("design:paramtypes", [create_tumor_type_in_dto_1.CreateTumorTypeInDto]),
     __metadata("design:returntype", Promise)
 ], TumorTypesController.prototype, "create", null);
 __decorate([
@@ -70,7 +70,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'Lista de tipos de tumor',
-        type: [TumorTypeResponseDto_1.TumorTypeResponseDto],
+        type: [TumorTypeResponse_outDto_1.TumorTypeResponseOutDto],
     }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
@@ -84,7 +84,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'Tipos de tumor encontrados',
-        type: [TumorTypeResponseDto_1.TumorTypeResponseDto],
+        type: [TumorTypeResponse_outDto_1.TumorTypeResponseOutDto],
         schema: {
             example: [
                 {
@@ -133,7 +133,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'Tipo de tumor encontrado',
-        type: TumorTypeResponseDto_1.TumorTypeResponseDto,
+        type: TumorTypeResponse_outDto_1.TumorTypeResponseOutDto,
     }),
     (0, swagger_1.ApiResponse)({
         status: 404,
@@ -151,7 +151,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'Tipo de tumor actualizado exitosamente',
-        type: TumorTypeResponseDto_1.TumorTypeResponseDto,
+        type: TumorTypeResponse_outDto_1.TumorTypeResponseOutDto,
         schema: {
             example: {
                 id: 1,
@@ -207,7 +207,7 @@ __decorate([
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, update_tumor_type_dto_1.UpdateTumorTypeDto]),
+    __metadata("design:paramtypes", [Number, update_tumor_type_in_dto_1.UpdateTumorTypeInDto]),
     __metadata("design:returntype", Promise)
 ], TumorTypesController.prototype, "update", null);
 __decorate([

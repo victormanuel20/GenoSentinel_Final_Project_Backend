@@ -1,10 +1,10 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { IsString, IsOptional } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { CreateTumorTypeDto } from './create-tumor-type.dto';
+import { CreateTumorTypeInDto } from './create-tumor-type-in.dto';
 
 
-export class UpdateTumorTypeDto extends PartialType(CreateTumorTypeDto) {
+export class UpdateTumorTypeInDto extends PartialType(CreateTumorTypeInDto) {
 
     @ApiPropertyOptional({ 
     example: 'Cáncer de mama invasivo',

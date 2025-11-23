@@ -1,7 +1,7 @@
 import { IsString, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateTumorTypeDto {
+export class CreateTumorTypeInDto {
   @ApiProperty({ 
     example: 'Cáncer de próstata',
     description: 'Nombre del tipo de tumor',
