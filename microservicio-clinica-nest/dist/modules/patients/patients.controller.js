@@ -15,12 +15,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PatientsController = void 0;
 const common_1 = require("@nestjs/common");
 const patients_service_1 = require("./patients.service");
-const create_patient_dto_1 = require("./dto/create-patient.dto");
-const update_patient_dto_1 = require("./dto/update-patient.dto");
-const patient_response_dto_1 = require("./dto/patient-response.dto");
-const search_patient_dto_1 = require("./dto/search-patient.dto");
+const create_patient_in_dto_1 = require("./dto/create-patient-in.dto");
+const update_patient_in_dto_1 = require("./dto/update-patient-in.dto");
+const patient_response_out_dto_1 = require("./dto/patient-response-out.dto");
+const search_patient_in_dto_1 = require("./dto/search-patient-in.dto");
 const swagger_1 = require("@nestjs/swagger");
-const DesactivatePatientDto_1 = require("./dto/DesactivatePatientDto");
+const DesactivatePatient_in_Dto_1 = require("./dto/DesactivatePatient-in.Dto");
 let PatientsController = class PatientsController {
     patientsService;
     constructor(patientsService) {
@@ -44,6 +44,9 @@ let PatientsController = class PatientsController {
     async desactivate(id, deactivatePatientDto) {
         return await this.patientsService.desactivate(id, deactivatePatientDto);
     }
+    async remove(id) {
+        return await this.patientsService.remove(id);
+    }
 };
 exports.PatientsController = PatientsController;
 __decorate([
@@ -52,7 +55,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'Lista de pacientes obtenida exitosamente',
-        type: [patient_response_dto_1.PatientResponseDto]
+        type: [patient_response_out_dto_1.PatientResponseOutDto]
     }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
@@ -67,7 +70,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'Pacientes encontrados',
-        type: [patient_response_dto_1.PatientResponseDto],
+        type: [patient_response_out_dto_1.PatientResponseOutDto],
     }),
     (0, swagger_1.ApiResponse)({
         status: 400,
@@ -79,7 +82,7 @@ __decorate([
     }),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [search_patient_dto_1.SearchPatientDto]),
+    __metadata("design:paramtypes", [search_patient_in_dto_1.SearchPatientInDto]),
     __metadata("design:returntype", Promise)
 ], PatientsController.prototype, "search", null);
 __decorate([
@@ -89,7 +92,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'Paciente encontrado',
-        type: patient_response_dto_1.PatientResponseDto,
+        type: patient_response_out_dto_1.PatientResponseOutDto,
     }),
     (0, swagger_1.ApiResponse)({
         status: 404,
@@ -114,7 +117,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({
         status: 201,
         description: 'Paciente creado exitosamente',
-        type: patient_response_dto_1.PatientResponseDto,
+        type: patient_response_out_dto_1.PatientResponseOutDto,
     }),
     (0, swagger_1.ApiResponse)({
         status: 400,
@@ -140,7 +143,7 @@ __decorate([
     }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_patient_dto_1.CreatePatientDto]),
+    __metadata("design:paramtypes", [create_patient_in_dto_1.CreatePatientInDto]),
     __metadata("design:returntype", Promise)
 ], PatientsController.prototype, "create", null);
 __decorate([
@@ -150,7 +153,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'Paciente actualizado exitosamente',
-        type: patient_response_dto_1.PatientResponseDto,
+        type: patient_response_out_dto_1.PatientResponseOutDto,
         schema: {
             example: {
                 id: 18,
@@ -198,7 +201,7 @@ __decorate([
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, update_patient_dto_1.UpdatePatientDto]),
+    __metadata("design:paramtypes", [Number, update_patient_in_dto_1.UpdatePatientInDto]),
     __metadata("design:returntype", Promise)
 ], PatientsController.prototype, "update", null);
 __decorate([
@@ -208,7 +211,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'Paciente desactivado exitosamente',
-        type: patient_response_dto_1.PatientResponseDto,
+        type: patient_response_out_dto_1.PatientResponseOutDto,
         schema: {
             example: {
                 id: 18,
@@ -245,9 +248,36 @@ __decorate([
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, DesactivatePatientDto_1.DesactivatePatientDto]),
+    __metadata("design:paramtypes", [Number, DesactivatePatient_in_Dto_1.DesactivatePatientInDto]),
     __metadata("design:returntype", Promise)
 ], PatientsController.prototype, "desactivate", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Eliminar un paciente inactivo' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'ID del paciente', example: 3 }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Paciente eliminado exitosamente',
+        schema: {
+            example: {
+                message: 'Paciente con ID 3 eliminado exitosamente',
+                success: true,
+            }
+        }
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 404,
+        description: 'Paciente no encontrado',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 409,
+        description: 'No se puede eliminar un paciente activo'
+    }),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], PatientsController.prototype, "remove", null);
 exports.PatientsController = PatientsController = __decorate([
     (0, swagger_1.ApiTags)('Pacientes'),
     (0, common_1.Controller)('patients'),

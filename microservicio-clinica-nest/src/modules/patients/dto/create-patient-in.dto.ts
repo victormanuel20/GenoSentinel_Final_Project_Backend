@@ -13,7 +13,7 @@ export enum PatientStatus {
   INACTIVO = 'Inactivo',
 }
 
-export class CreatePatientDto {
+export class CreatePatientInDto {
   @ApiProperty({ 
     example: 'Juan',
     description: 'Nombre(s) del paciente',

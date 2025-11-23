@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateTumorTypeDto } from './dto/create-tumor-type.dto';
-import { UpdateTumorTypeDto } from './dto/update-tumor-type.dto';
+import { CreateTumorTypeInDto } from './dto/create-tumor-type-in.dto';
+import { UpdateTumorTypeInDto } from './dto/update-tumor-type-in.dto';
 import { TumorType } from './entities/tumor-type.entity';
-import { TumorTypeResponseDto } from './dto/TumorTypeResponseDto';
+import { TumorTypeResponseOutDto } from './dto/TumorTypeResponse-outDto';
 import { TumorTypeAlreadyExistsException } from './exceptions/TumorTypeAlreadyExistsException';
 import { TumorTypeNotFoundException } from './exceptions/TumorTypeNotFoundException';
 import { EmptyUpdateDataException } from './exceptions/EmptyUpdateDataException ';
@@ -24,7 +24,7 @@ export class TumorTypesService {
   ) {}
 
   // 1. CREAR TIPO DE TUMOR
-  async create(createDto: CreateTumorTypeDto): Promise<TumorTypeResponseDto> {
+  async create(createDto: CreateTumorTypeInDto): Promise<TumorTypeResponseOutDto> {
     // Validar que no exista duplicado
     const existing = await this.tumorTypeRepository.findOne({
       where: { name: createDto.name },
@@ -42,14 +42,14 @@ export class TumorTypesService {
   }
 
   // 2. LISTAR TODOS
-  async findAll(): Promise<TumorTypeResponseDto[]> {
+  async findAll(): Promise<TumorTypeResponseOutDto[]> {
     const tumorTypes = await this.tumorTypeRepository.find();
     return tumorTypes.map(tt => this.toResponseDto(tt));
   }
 
 
   // 3. BUSCAR POR ID
-  async findOne(id: number): Promise<TumorTypeResponseDto> {
+  async findOne(id: number): Promise<TumorTypeResponseOutDto> {
     const tumorType = await this.tumorTypeRepository.findOne({
       where: { id },
     });
@@ -63,7 +63,7 @@ export class TumorTypesService {
 
       
     // 4. ACTUALIZAR TIPO DE TUMOR
-  async update(id: number, updateDto: UpdateTumorTypeDto): Promise<TumorTypeResponseDto> {
+  async update(id: number, updateDto: UpdateTumorTypeInDto): Promise<TumorTypeResponseOutDto> {
     // 1. Verificar que el tipo de tumor existe
     const existingTumorType = await this.tumorTypeRepository.findOne({
       where: { id },
@@ -116,7 +116,7 @@ export class TumorTypesService {
   }
 
   // MÉTODO AUXILIAR
-  private toResponseDto(tumorType: TumorType): TumorTypeResponseDto {
+  private toResponseDto(tumorType: TumorType): TumorTypeResponseOutDto {
     return {
       id: tumorType.id,
       name: tumorType.name,
@@ -153,7 +153,7 @@ async remove(id: number): Promise<{ message: string; success: boolean }> {
 
 
 // 7. BUSCAR POR CRITERIOS
-async search(searchDto: SearchTumorTypeInDto): Promise<TumorTypeResponseDto[]> {
+async search(searchDto: SearchTumorTypeInDto): Promise<TumorTypeResponseOutDto[]> {
   // 1. Construir objeto con solo los campos que tienen valor
   const searchData: any = {};
 

@@ -1,9 +1,9 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete,HttpCode, HttpStatus,ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse,ApiParam,ApiQuery} from '@nestjs/swagger';
 import { TumorTypesService } from './tumor-types.service';
-import { TumorTypeResponseDto } from './dto/TumorTypeResponseDto';
-import { CreateTumorTypeDto } from './dto/create-tumor-type.dto';
-import { UpdateTumorTypeDto } from './dto/update-tumor-type.dto';
+import { TumorTypeResponseOutDto } from './dto/TumorTypeResponse-outDto';
+import { CreateTumorTypeInDto } from './dto/create-tumor-type-in.dto';
+import { UpdateTumorTypeInDto } from './dto/update-tumor-type-in.dto';
 import { SearchTumorTypeInDto } from './dto/SearchTumorTypeInDto';
 import { Query } from '@nestjs/common';
 
@@ -20,13 +20,13 @@ export class TumorTypesController {
   @ApiResponse({ 
     status: 201, 
     description: 'Tipo de tumor creado exitosamente',
-    type: TumorTypeResponseDto,
+    type: TumorTypeResponseOutDto,
   })
   @ApiResponse({ 
     status: 409, 
     description: 'Ya existe un tipo de tumor con ese nombre',
   })
-  async create(@Body() createDto: CreateTumorTypeDto): Promise<TumorTypeResponseDto> {
+  async create(@Body() createDto: CreateTumorTypeInDto): Promise<TumorTypeResponseOutDto> {
     return await this.tumorTypesService.create(createDto);
   }
 
@@ -36,9 +36,9 @@ export class TumorTypesController {
   @ApiResponse({ 
     status: 200, 
     description: 'Lista de tipos de tumor',
-    type: [TumorTypeResponseDto],
+    type: [TumorTypeResponseOutDto],
   })
-  async findAll(): Promise<TumorTypeResponseDto[]> {
+  async findAll(): Promise<TumorTypeResponseOutDto[]> {
     return await this.tumorTypesService.findAll();
   }
 
@@ -50,7 +50,7 @@ export class TumorTypesController {
   @ApiResponse({ 
     status: 200, 
     description: 'Tipos de tumor encontrados',
-    type: [TumorTypeResponseDto],
+    type: [TumorTypeResponseOutDto],
     schema: {
       example: [
         {
@@ -83,7 +83,7 @@ export class TumorTypesController {
       }
     }
   })
-  async search(@Query() searchDto: SearchTumorTypeInDto): Promise<TumorTypeResponseDto[]> {
+  async search(@Query() searchDto: SearchTumorTypeInDto): Promise<TumorTypeResponseOutDto[]> {
     return await this.tumorTypesService.search(searchDto);
   }
 
@@ -101,7 +101,7 @@ export class TumorTypesController {
   @ApiResponse({
     status: 200,
     description: 'Tipo de tumor encontrado',
-    type: TumorTypeResponseDto,
+    type: TumorTypeResponseOutDto,
   })
   @ApiResponse({
     status: 404,
@@ -109,7 +109,7 @@ export class TumorTypesController {
   })
   async findOne(
     @Param('id', ParseIntPipe) id: number,
-  ): Promise<TumorTypeResponseDto> {
+  ): Promise<TumorTypeResponseOutDto> {
     return await this.tumorTypesService.findOne(id);
   }
 
@@ -121,7 +121,7 @@ export class TumorTypesController {
     @ApiResponse({ 
       status: 200, 
       description: 'Tipo de tumor actualizado exitosamente',
-      type: TumorTypeResponseDto,
+      type: TumorTypeResponseOutDto,
       schema: {
         example: {
           id: 1,
@@ -176,8 +176,8 @@ export class TumorTypesController {
     })
     async update(
       @Param('id', ParseIntPipe) id: number,
-      @Body() updateDto: UpdateTumorTypeDto,
-    ): Promise<TumorTypeResponseDto> {
+      @Body() updateDto: UpdateTumorTypeInDto,
+    ): Promise<TumorTypeResponseOutDto> {
       return await this.tumorTypesService.update(id, updateDto);
     }
 
