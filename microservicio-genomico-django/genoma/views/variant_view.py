@@ -7,50 +7,60 @@ from genoma.models.DTOs.variant_dto import VariantDTO
 from genoma.models.DTOs.create_variant_dto import CreateVariantDTO
 from genoma.models.DTOs.update_variant_dto import UpdateVariantDTO
 
+# Excepciones personalizadas
 from genoma.exceptions.not_found_exception import NotFoundException
 from genoma.exceptions.bad_request_exception import BadRequestException
-from genoma.exceptions.base_exception import BaseAPIException
+from genoma.exceptions.invalid_numeric_value_exception import InvalidNumericValueException
+from genoma.exceptions.invalid_type_exception import InvalidTypeException
+from genoma.exceptions.duplicate_resource_exception import DuplicateResourceException
 
 
+# -----------------------------------------------------------
+# VALIDACIÓN CENTRALIZADA
+# -----------------------------------------------------------
+def validate_positive_int(value, field_name):
+
+    if not isinstance(value, str):
+        raise InvalidTypeException(f"{field_name} must be a numeric string")
+
+    if not value.isdigit():
+        raise InvalidTypeException(f"{field_name} must contain only digits")
+
+    number = int(value)
+
+    if number < 1:
+        raise InvalidNumericValueException(f"{field_name} must be a positive integer")
+
+    return number
+
+
+# -----------------------------------------------------------
+# ENDPOINTS
+# -----------------------------------------------------------
 def get_all_variants(request):
-    # GET /variants/
     variants = GeneticVariant.objects.all()
     dto_list = [VariantDTO.from_model(v).to_dict() for v in variants]
     return JsonResponse(dto_list, safe=False, status=200)
 
 
-def get_variant_by_id(request, variant_id):
-    #GET /variants/<id>/
+def get_variant_by_id(request, variant_id_str):
+
+    variant_id = validate_positive_int(variant_id_str, "variant_id")
+
     try:
         variant = GeneticVariant.objects.get(id=variant_id)
     except GeneticVariant.DoesNotExist:
         raise NotFoundException("Variant not found")
 
-    dto = VariantDTO.from_model(variant).to_dict()
-    return JsonResponse(dto, status=200)
+    return JsonResponse(VariantDTO.from_model(variant).to_dict(), status=200)
 
 
-def get_variants_by_gene(request):
-    # GET /variants/by-gene?gene_id=<id>
-    gene_id = request.GET.get("gene_id")
-
-    if not gene_id:
-        raise BadRequestException("gene_id query parameter is required")
-
-    try:
-        Gene.objects.get(id=gene_id)
-    except Gene.DoesNotExist:
-        raise NotFoundException("Gene not found")
-
-    variants = GeneticVariant.objects.filter(gene_id=gene_id)
-    dto_list = [VariantDTO.from_model(v).to_dict() for v in variants]
-
-    return JsonResponse(dto_list, safe=False, status=200)
-
-
+# -----------------------------------------------------------
+# CREATE
+# -----------------------------------------------------------
 @csrf_exempt
 def create_variant(request):
-    # POST /variants/create/
+
     if request.method != "POST":
         raise BadRequestException("Method not allowed")
 
@@ -59,14 +69,25 @@ def create_variant(request):
         dto = CreateVariantDTO(data)
     except ValueError as ve:
         raise BadRequestException(ve.args[0])
-    except Exception:
+    except:
         raise BadRequestException("Invalid JSON format")
 
-    # validar que el gene exista
+    gene_id = validate_positive_int(dto.gene_id, "gene_id")
+
     try:
-        gene = Gene.objects.get(id=dto.gene_id)
+        gene = Gene.objects.get(id=gene_id)
     except Gene.DoesNotExist:
         raise NotFoundException("Gene not found")
+
+    # --- validar duplicado ---
+    if GeneticVariant.objects.filter(
+        gene_id=gene_id,
+        chromosome=dto.chromosome,
+        position=dto.position,
+        reference_base=dto.reference_base,
+        alternate_base=dto.alternate_base
+    ).exists():
+        raise DuplicateResourceException("This variant already exists")
 
     variant = GeneticVariant.objects.create(
         gene=gene,
@@ -80,9 +101,14 @@ def create_variant(request):
     return JsonResponse(VariantDTO.from_model(variant).to_dict(), status=201)
 
 
+# -----------------------------------------------------------
+# UPDATE
+# -----------------------------------------------------------
 @csrf_exempt
-def update_variant(request, variant_id):
-    # PUT/variants/<id>/update/
+def update_variant(request, variant_id_str):
+
+    variant_id = validate_positive_int(variant_id_str, "variant_id")
+
     if request.method != "PUT":
         raise BadRequestException("Method not allowed")
 
@@ -96,15 +122,27 @@ def update_variant(request, variant_id):
         dto = UpdateVariantDTO(data)
     except ValueError as ve:
         raise BadRequestException(ve.args[0])
-    except Exception:
+    except:
         raise BadRequestException("Invalid JSON format")
 
-    #validar gene opcional
+    # Si se quiere cambiar el gene_id:
     if dto.gene_id is not None:
+        gene_id = validate_positive_int(dto.gene_id, "gene_id")
+
         try:
-            variant.gene = Gene.objects.get(id=dto.gene_id)
+            variant.gene = Gene.objects.get(id=gene_id)
         except Gene.DoesNotExist:
             raise NotFoundException("Gene not found")
+
+    # --- validar duplicado ---
+    if GeneticVariant.objects.filter(
+        gene_id=variant.gene_id,
+        chromosome=dto.chromosome,
+        position=dto.position,
+        reference_base=dto.reference_base,
+        alternate_base=dto.alternate_base
+    ).exclude(id=variant_id).exists():
+        raise DuplicateResourceException("This variant already exists")
 
     variant.chromosome = dto.chromosome
     variant.position = dto.position
@@ -117,9 +155,14 @@ def update_variant(request, variant_id):
     return JsonResponse(VariantDTO.from_model(variant).to_dict(), status=200)
 
 
+# -----------------------------------------------------------
+# DELETE
+# -----------------------------------------------------------
 @csrf_exempt
-def delete_variant(request, variant_id):
-    # DELETE /variants/<id>/delete/
+def delete_variant(request, variant_id_str):
+
+    variant_id = validate_positive_int(variant_id_str, "variant_id")
+
     if request.method != "DELETE":
         raise BadRequestException("Method not allowed")
 
