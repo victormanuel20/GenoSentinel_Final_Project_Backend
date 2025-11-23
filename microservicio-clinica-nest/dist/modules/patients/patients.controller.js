@@ -17,7 +17,7 @@ const common_1 = require("@nestjs/common");
 const patients_service_1 = require("./patients.service");
 const create_patient_dto_1 = require("./dto/create-patient.dto");
 const update_patient_dto_1 = require("./dto/update-patient.dto");
-const patient_response_dto_1 = require("./dto/patient-response.dto");
+const patient_response_out_dto_1 = require("./dto/patient-response-out.dto");
 const search_patient_dto_1 = require("./dto/search-patient.dto");
 const swagger_1 = require("@nestjs/swagger");
 const DesactivatePatientDto_1 = require("./dto/DesactivatePatientDto");
@@ -52,7 +52,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'Lista de pacientes obtenida exitosamente',
-        type: [patient_response_dto_1.PatientResponseDto]
+        type: [patient_response_out_dto_1.PatientResponseOutDto]
     }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
@@ -67,7 +67,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'Pacientes encontrados',
-        type: [patient_response_dto_1.PatientResponseDto],
+        type: [patient_response_out_dto_1.PatientResponseOutDto],
     }),
     (0, swagger_1.ApiResponse)({
         status: 400,
@@ -89,7 +89,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'Paciente encontrado',
-        type: patient_response_dto_1.PatientResponseDto,
+        type: patient_response_out_dto_1.PatientResponseOutDto,
     }),
     (0, swagger_1.ApiResponse)({
         status: 404,
@@ -114,7 +114,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({
         status: 201,
         description: 'Paciente creado exitosamente',
-        type: patient_response_dto_1.PatientResponseDto,
+        type: patient_response_out_dto_1.PatientResponseOutDto,
     }),
     (0, swagger_1.ApiResponse)({
         status: 400,
@@ -150,7 +150,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'Paciente actualizado exitosamente',
-        type: patient_response_dto_1.PatientResponseDto,
+        type: patient_response_out_dto_1.PatientResponseOutDto,
         schema: {
             example: {
                 id: 18,
@@ -208,7 +208,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'Paciente desactivado exitosamente',
-        type: patient_response_dto_1.PatientResponseDto,
+        type: patient_response_out_dto_1.PatientResponseOutDto,
         schema: {
             example: {
                 id: 18,

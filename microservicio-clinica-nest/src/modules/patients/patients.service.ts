@@ -1,7 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { Patient } from './entities/patient.entity';
-import { PatientResponseDto } from './dto/patient-response.dto';
+import { PatientResponseOutDto } from './dto/patient-response-out.dto';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { SearchPatientDto } from './dto/search-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
@@ -23,7 +23,7 @@ export class PatientsService {
     private readonly patientRepository: Repository<Patient>,
   ) {}
 
-   async findAll(): Promise<PatientResponseDto[]> {
+   async findAll(): Promise<PatientResponseOutDto[]> {
     const patients = await this.patientRepository.find();
     
     return patients.map(patient => ({
@@ -38,7 +38,7 @@ export class PatientsService {
 
 
   // BUSCAR POR ID
-  async findOne(id: number): Promise<PatientResponseDto> {
+  async findOne(id: number): Promise<PatientResponseOutDto> {
     const patient = await this.patientRepository.findOne({
       where: { id },
     });
@@ -51,7 +51,7 @@ export class PatientsService {
   }
 
   // BUSCAR POR CRITERIOS (nombre, apellido, fecha)
-  async search(searchDto: SearchPatientDto): Promise<PatientResponseDto[]> {
+  async search(searchDto: SearchPatientDto): Promise<PatientResponseOutDto[]> {
     // Validar que al menos un criterio esté presente
     if (!searchDto.firstName && !searchDto.lastName && !searchDto.birthDate) {
       throw new InvalidSearchParamsException();
@@ -86,7 +86,7 @@ export class PatientsService {
   }
 
 
-  async create(createPatientDto: CreatePatientDto): Promise<PatientResponseDto> {
+  async create(createPatientDto: CreatePatientDto): Promise<PatientResponseOutDto> {
     // 1. Buscar pacientes con el mismo nombre Y fecha
     const existingPatient = await this.patientRepository.findOne({
       where: {
@@ -135,7 +135,7 @@ export class PatientsService {
   }
 
   //Convertir Entity a DTO
-  private toResponseDto(patient: Patient): PatientResponseDto {
+  private toResponseDto(patient: Patient): PatientResponseOutDto {
     return {
       id: patient.id,
       firstName: patient.firstName,
@@ -147,7 +147,7 @@ export class PatientsService {
   }
 
 
-  async update(id: number, updatePatientDto: UpdatePatientDto): Promise<PatientResponseDto> {
+  async update(id: number, updatePatientDto: UpdatePatientDto): Promise<PatientResponseOutDto> {
   // 1. Verificar que el paciente existe
   const existingPatient = await this.patientRepository.findOne({
     where: { id },
@@ -198,7 +198,7 @@ if (updatePatientDto.firstName || updatePatientDto.lastName || updatePatientDto.
 }
 
 //Desactivar paciente 
-async desactivate(id: number, deactivatePatientDto: DesactivatePatientDto): Promise<PatientResponseDto> {
+async desactivate(id: number, deactivatePatientDto: DesactivatePatientDto): Promise<PatientResponseOutDto> {
   // 1. Verificar que el paciente existe
   const existingPatient = await this.patientRepository.findOne({
     where: { id },
