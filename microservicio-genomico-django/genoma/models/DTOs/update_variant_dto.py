@@ -1,7 +1,11 @@
+from genoma.models import Gene
+
 class UpdateVariantDTO:
 
     def __init__(self, data):
-        self.gene_id = data.get("gene_id")   # ← agregado
+        raw_gene_id = data.get("gene_id")
+        self.gene_id = str(raw_gene_id) if raw_gene_id is not None else None
+
         self.chromosome = data.get("chromosome")
         self.position = data.get("position")
         self.reference_base = data.get("reference_base")
@@ -13,9 +17,15 @@ class UpdateVariantDTO:
     def validate(self):
         errors = {}
 
-        # gene_id es opcional, solo validar si lo mandan
-        if self.gene_id is not None and not str(self.gene_id).isdigit():
-            errors["gene_id"] = "gene_id must be a valid number."
+        # gene_id es OPCIONAL, pero si viene debe ser válido
+        if self.gene_id is not None:
+
+            if not self.gene_id.isdigit():
+                errors["gene_id"] = "gene_id must contain only digits."
+
+            else:
+                if not Gene.objects.filter(id=int(self.gene_id)).exists():
+                    errors["gene_id"] = "Gene with given ID does not exist."
 
         if not self.chromosome or self.chromosome.strip() == "":
             errors["chromosome"] = "Chromosome is required."

@@ -3,7 +3,10 @@ from genoma.models import Gene
 class CreateVariantDTO:
 
     def __init__(self, data):
-        self.gene_id = data.get("gene_id")
+        # Convertimos gene_id a string SIEMPRE
+        raw_gene_id = data.get("gene_id")
+        self.gene_id = str(raw_gene_id) if raw_gene_id is not None else None
+
         self.chromosome = data.get("chromosome")
         self.position = data.get("position")
         self.reference_base = data.get("reference_base")
@@ -15,11 +18,17 @@ class CreateVariantDTO:
     def validate(self):
         errors = {}
 
+        # gene_id requerido
         if not self.gene_id:
             errors["gene_id"] = "Gene ID is required."
         else:
-            if not Gene.objects.filter(id=self.gene_id).exists():
-                errors["gene_id"] = "Gene with given ID does not exist."
+            # Debe ser dígito
+            if not self.gene_id.isdigit():
+                errors["gene_id"] = "gene_id must contain only digits."
+            # Si es número válido, entonces verificar existencia
+            else:
+                if not Gene.objects.filter(id=int(self.gene_id)).exists():
+                    errors["gene_id"] = "Gene with given ID does not exist."
 
         if not self.chromosome or self.chromosome.strip() == "":
             errors["chromosome"] = "Chromosome is required."
