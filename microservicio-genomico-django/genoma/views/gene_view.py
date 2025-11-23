@@ -10,22 +10,46 @@ from genoma.models.DTOs.update_gene_dto import UpdateGeneDTO
 # Excepciones personalizadas
 from genoma.exceptions.not_found_exception import NotFoundException
 from genoma.exceptions.bad_request_exception import BadRequestException
-from genoma.exceptions.base_exception import BaseAPIException
+from genoma.exceptions.invalid_numeric_value_exception import InvalidNumericValueException
+from genoma.exceptions.invalid_type_exception import InvalidTypeException
 
+
+# -----------------------------------------------------------
+# VALIDACIÓN CENTRALIZADA: ENTERO POSITIVO
+# -----------------------------------------------------------
+def validate_positive_int(value, field_name):
+
+    # 1. Debe llegar como string
+    if not isinstance(value, str):
+        raise InvalidTypeException(f"{field_name} must be a numeric string")
+
+    # 2. Intentar convertir a entero
+    try:
+        number = int(value)
+    except ValueError:
+        raise InvalidTypeException(f"{field_name} must be an integer number")
+
+    # 3. Debe ser entero positivo
+    if number < 1:
+        raise InvalidNumericValueException(f"{field_name} must be a positive integer")
+
+    return number
+
+
+# -----------------------------------------------------------
+# ENDPOINTS GENE
+# -----------------------------------------------------------
 
 def get_all_genes(request):
-    # GET /genes/
-    # Devuelve la lista de todos los genes.
     genes = Gene.objects.all()
-
     dto_list = [GeneDTO.from_model(g).to_dict() for g in genes]
-
     return JsonResponse(dto_list, safe=False, status=200)
 
 
-def get_gene_by_id(request, gene_id):
-    # GET /genes/<id>/
-    # Devuelve un gen específico.
+def get_gene_by_id(request, gene_id_str):
+
+    gene_id = validate_positive_int(gene_id_str, "gene_id")
+
     try:
         gene = Gene.objects.get(id=gene_id)
     except Gene.DoesNotExist:
@@ -36,15 +60,12 @@ def get_gene_by_id(request, gene_id):
 
 
 def search_gene_by_symbol(request):
-    # GET /genes/search?symbol=BRCA1
-    # Búsqueda por símbolo EXACTO o parcialmente.
     symbol = request.GET.get("symbol", "")
 
     if symbol == "":
         raise BadRequestException("Symbol query parameter is required")
 
     genes = Gene.objects.filter(symbol__icontains=symbol)
-
     dto_list = [GeneDTO.from_model(g).to_dict() for g in genes]
 
     return JsonResponse(dto_list, safe=False, status=200)
@@ -52,8 +73,6 @@ def search_gene_by_symbol(request):
 
 @csrf_exempt
 def create_gene(request):
-    # POST /genes/
-    # Crea un nuevo gen.
     if request.method != "POST":
         raise BadRequestException("Method not allowed")
 
@@ -75,9 +94,10 @@ def create_gene(request):
 
 
 @csrf_exempt
-def update_gene(request, gene_id):
-    # PUT /genes/<id>/
-    # Actualiza un gen existente.
+def update_gene(request, gene_id_str):
+
+    gene_id = validate_positive_int(gene_id_str, "gene_id")
+
     if request.method != "PUT":
         raise BadRequestException("Method not allowed")
 
@@ -103,9 +123,10 @@ def update_gene(request, gene_id):
 
 
 @csrf_exempt
-def delete_gene(request, gene_id):
-    # DELETE /genes/<id>/
-    # Elimina un gen.
+def delete_gene(request, gene_id_str):
+
+    gene_id = validate_positive_int(gene_id_str, "gene_id")
+
     if request.method != "DELETE":
         raise BadRequestException("Method not allowed")
 
