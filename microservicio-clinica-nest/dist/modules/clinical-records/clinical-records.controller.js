@@ -18,6 +18,7 @@ const swagger_1 = require("@nestjs/swagger");
 const clinical_records_service_1 = require("./clinical-records.service");
 const create_clinical_record_in_dto_1 = require("./dto/create-clinical-record-in.dto");
 const clinical_record_out_dto_1 = require("./dto/clinical-record-out.dto");
+const update_clinical_record_in_dto_1 = require("./dto/update-clinical-record-in.dto");
 let ClinicalRecordsController = class ClinicalRecordsController {
     clinicalRecordsService;
     constructor(clinicalRecordsService) {
@@ -37,6 +38,9 @@ let ClinicalRecordsController = class ClinicalRecordsController {
     }
     async findOne(id) {
         return await this.clinicalRecordsService.findOne(id);
+    }
+    async update(id, updateDto) {
+        return await this.clinicalRecordsService.update(id, updateDto);
     }
 };
 exports.ClinicalRecordsController = ClinicalRecordsController;
@@ -139,6 +143,75 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], ClinicalRecordsController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Actualizar la evolución de una historia clínica (stage y/o tratamiento)' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'ID de la historia clínica', example: 1 }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Historia clínica actualizada exitosamente',
+        type: clinical_record_out_dto_1.ClinicalRecordOutDto,
+        schema: {
+            example: {
+                id: 1,
+                patientId: 1,
+                tumorTypeId: 1,
+                diagnosisDate: '2023-01-15',
+                stage: 'III',
+                treatmentProtocol: 'Quimioterapia de segunda línea',
+                patient: {
+                    id: 1,
+                    fullName: 'Ana García López',
+                    gender: 'Femenino',
+                    status: 'Activo'
+                },
+                tumorType: {
+                    id: 1,
+                    name: 'Cáncer de mama',
+                    systemAffected: 'Glándulas'
+                }
+            }
+        }
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 400,
+        description: 'Datos inválidos o sin campos para actualizar',
+        schema: {
+            examples: {
+                noFields: {
+                    value: {
+                        statusCode: 400,
+                        message: 'Debe proporcionar al menos un campo para actualizar (stage o treatmentProtocol)',
+                        error: 'Bad Request'
+                    }
+                },
+                emptyFields: {
+                    value: {
+                        statusCode: 400,
+                        message: ['La etapa debe ser texto'],
+                        error: 'Bad Request'
+                    }
+                }
+            }
+        }
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 404,
+        description: 'Historia clínica no encontrada',
+        schema: {
+            example: {
+                statusCode: 404,
+                message: 'Historia clínica con ID 999 no encontrada',
+                error: 'Not Found'
+            }
+        }
+    }),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, update_clinical_record_in_dto_1.UpdateClinicalRecordInDto]),
+    __metadata("design:returntype", Promise)
+], ClinicalRecordsController.prototype, "update", null);
 exports.ClinicalRecordsController = ClinicalRecordsController = __decorate([
     (0, swagger_1.ApiTags)('Historias clinicas'),
     (0, common_1.Controller)('clinical-records'),

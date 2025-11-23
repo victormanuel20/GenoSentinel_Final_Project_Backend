@@ -25,6 +25,7 @@ const tumor_type_not_found_for_record_exception_1 = require("./exceptions/tumor-
 const duplicate_clinical_record_exception_1 = require("./exceptions/duplicate-clinical-record.exception");
 const no_records_found_for_patient_exception_1 = require("./exceptions/no-records-found-for-patient.exception");
 const no_records_found_for_tumor_type_exception_1 = require("./exceptions/no-records-found-for-tumor-type.exception");
+const no_fields_to_update_exception_1 = require("./exceptions/no-fields-to-update.exception");
 let ClinicalRecordsService = class ClinicalRecordsService {
     clinicalRecordRepository;
     patientRepository;
@@ -120,6 +121,33 @@ let ClinicalRecordsService = class ClinicalRecordsService {
             throw new no_records_found_for_tumor_type_exception_1.NoRecordsFoundForTumorTypeException(tumorTypeId);
         }
         return records.map(record => this.toOutDto(record));
+    }
+    async update(id, updateDto) {
+        const existingRecord = await this.clinicalRecordRepository.findOne({
+            where: { id },
+        });
+        if (!existingRecord) {
+            throw new clinical_record_not_found_exception_1.ClinicalRecordNotFoundException(id);
+        }
+        const updateData = {};
+        if (updateDto.stage !== undefined && updateDto.stage.trim() !== '') {
+            updateData.stage = updateDto.stage.trim();
+        }
+        if (updateDto.treatmentProtocol !== undefined && updateDto.treatmentProtocol.trim() !== '') {
+            updateData.treatmentProtocol = updateDto.treatmentProtocol.trim();
+        }
+        if (Object.keys(updateData).length === 0) {
+            throw new no_fields_to_update_exception_1.NoFieldsToUpdateException();
+        }
+        await this.clinicalRecordRepository.update(id, updateData);
+        const updatedRecord = await this.clinicalRecordRepository.findOne({
+            where: { id },
+            relations: ['patient', 'tumorType'],
+        });
+        if (!updatedRecord) {
+            throw new clinical_record_not_found_exception_1.ClinicalRecordNotFoundException(id);
+        }
+        return this.toOutDto(updatedRecord);
     }
     toOutDto(record) {
         return {

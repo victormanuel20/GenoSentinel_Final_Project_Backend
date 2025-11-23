@@ -12,6 +12,9 @@ import { TumorTypeNotFoundForRecordException } from './exceptions/tumor-type-not
 import { DuplicateClinicalRecordException } from './exceptions/duplicate-clinical-record.exception';
 import { NoRecordsFoundForPatientException } from './exceptions/no-records-found-for-patient.exception';
 import { NoRecordsFoundForTumorTypeException } from './exceptions/no-records-found-for-tumor-type.exception';
+import { NoFieldsToUpdateException } from './exceptions/no-fields-to-update.exception';
+import { UpdateClinicalRecordInDto } from './dto/update-clinical-record-in.dto';
+
 
 @Injectable()
 export class ClinicalRecordsService {
@@ -159,6 +162,54 @@ async findByTumorType(tumorTypeId: number): Promise<ClinicalRecordOutDto[]> {
 
   return records.map(record => this.toOutDto(record));
 }
+
+
+  // 6. ACTUALIZAR HISTORIA CLÍNICA (EVOLUCIÓN)
+  async update(id: number, updateDto: UpdateClinicalRecordInDto): Promise<ClinicalRecordOutDto> {
+    // 1. Verificar que la historia clínica existe
+    const existingRecord = await this.clinicalRecordRepository.findOne({
+      where: { id },
+    });
+
+    if (!existingRecord) {
+      throw new ClinicalRecordNotFoundException(id);
+    }
+
+    // 2. Construir objeto con solo los campos que tienen valor
+    const updateData: Partial<ClinicalRecord> = {};
+
+    if (updateDto.stage !== undefined && updateDto.stage.trim() !== '') {
+      updateData.stage = updateDto.stage.trim();
+    }
+
+    if (updateDto.treatmentProtocol !== undefined && updateDto.treatmentProtocol.trim() !== '') {
+      updateData.treatmentProtocol = updateDto.treatmentProtocol.trim();
+    }
+
+    // 3. Validar que hay al menos un campo para actualizar
+    if (Object.keys(updateData).length === 0) {
+      throw new NoFieldsToUpdateException();
+    }
+
+    // 4. Actualizar
+    await this.clinicalRecordRepository.update(id, updateData);
+
+    // 5. Retornar la historia clínica actualizada con relaciones
+    const updatedRecord = await this.clinicalRecordRepository.findOne({
+      where: { id },
+      relations: ['patient', 'tumorType'],
+    });
+
+    if (!updatedRecord) {
+      throw new ClinicalRecordNotFoundException(id);
+    }
+
+    return this.toOutDto(updatedRecord);
+  }
+
+
+
+
 
   // MÉTODO AUXILIAR: Convertir Entity a OutDto
   private toOutDto(record: ClinicalRecord): ClinicalRecordOutDto {
