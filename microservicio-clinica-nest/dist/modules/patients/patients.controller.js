@@ -44,6 +44,9 @@ let PatientsController = class PatientsController {
     async desactivate(id, deactivatePatientDto) {
         return await this.patientsService.desactivate(id, deactivatePatientDto);
     }
+    async remove(id) {
+        return await this.patientsService.remove(id);
+    }
 };
 exports.PatientsController = PatientsController;
 __decorate([
@@ -248,6 +251,33 @@ __decorate([
     __metadata("design:paramtypes", [Number, DesactivatePatient_in_Dto_1.DesactivatePatientInDto]),
     __metadata("design:returntype", Promise)
 ], PatientsController.prototype, "desactivate", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Eliminar un paciente inactivo' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'ID del paciente', example: 3 }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Paciente eliminado exitosamente',
+        schema: {
+            example: {
+                message: 'Paciente con ID 3 eliminado exitosamente',
+                success: true,
+            }
+        }
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 404,
+        description: 'Paciente no encontrado',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 409,
+        description: 'No se puede eliminar un paciente activo'
+    }),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], PatientsController.prototype, "remove", null);
 exports.PatientsController = PatientsController = __decorate([
     (0, swagger_1.ApiTags)('Pacientes'),
     (0, common_1.Controller)('patients'),

@@ -13,4 +13,8 @@ export declare class PatientsController {
     create(createPatientDto: CreatePatientInDto): Promise<PatientResponseOutDto>;
     update(id: number, updatePatientDto: UpdatePatientInDto): Promise<PatientResponseOutDto>;
     desactivate(id: number, deactivatePatientDto: DesactivatePatientInDto): Promise<PatientResponseOutDto>;
+    remove(id: number): Promise<{
+        message: string;
+        success: boolean;
+    }>;
 }

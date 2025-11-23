@@ -217,4 +217,31 @@ async desactivate(
 }
 
 
+  // 7. ELIMINAR PACIENTE
+  @Delete(':id')
+  @ApiOperation({ summary: 'Eliminar un paciente inactivo' })
+  @ApiParam({ name: 'id', description: 'ID del paciente', example: 3 })
+  @ApiResponse({
+    status: 200,
+    description: 'Paciente eliminado exitosamente',
+    schema: {
+      example: {
+        message: 'Paciente con ID 3 eliminado exitosamente',
+        success: true,
+      }
+    }
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Paciente no encontrado',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'No se puede eliminar un paciente activo'
+  })
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return await this.patientsService.remove(id);
+  }
+
+
 }

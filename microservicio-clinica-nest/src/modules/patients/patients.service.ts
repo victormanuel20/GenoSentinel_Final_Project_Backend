@@ -13,8 +13,7 @@ import { InvalidSearchParamsException } from './exceptions/invalid-search-params
 import { PatientsNotFoundException } from './exceptions/PatientsNotFoundException';
 import { PatientUpdateFailedException } from './exceptions/PatientUpdateFailedException';
 import { PatientAlreadyInactiveException } from './exceptions/PatientAlreadyInactiveException';
-
-
+import {CannotDeleteActivePatientException} from './exceptions/CannotDeleteActivePatientException';
 
 @Injectable()
 export class PatientsService {
@@ -233,6 +232,29 @@ async desactivate(id: number, deactivatePatientDto: DesactivatePatientInDto): Pr
 
   return this.toResponseDto(updatedPatient);
 }
+
+async remove(id: number): Promise<{ message: string; success: boolean }> {
+  // 1. Verificar que el paciente existe
+  const patient = await this.patientRepository.findOne({ where: { id } });
+
+  if (!patient) {
+    throw new PatientNotFoundException(id);
+  }
+
+  // 2. Evitar borrar un paciente ACTIVO
+  if (patient.status !== 'Inactivo') {
+    throw new CannotDeleteActivePatientException(id);
+  }
+
+  // 3. Eliminar → CASCADE borrará automáticamente sus historias clínicas
+  await this.patientRepository.remove(patient);
+
+  return {
+    message: `Paciente con ID ${id} eliminado exitosamente`,
+    success: true,
+  };
+}
+
 
 
 
