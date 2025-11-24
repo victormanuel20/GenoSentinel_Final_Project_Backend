@@ -16,7 +16,15 @@ class VariantViewSet(viewsets.ModelViewSet):
     # ------------------------------
     @swagger_auto_schema(
         operation_summary="Obtener todas las variantes",
-        responses={200: "Success"}
+        operation_description=(
+            "Retorna todas las variantes registradas.\n\n"
+            "Posibles errores:\n"
+            "- 500: Unexpected server error"
+        ),
+        responses={
+            200: "Success",
+            500: "Unexpected server error"
+        }
     )
     def list(self, request):
         result = VariantService.list_variants()
@@ -27,7 +35,19 @@ class VariantViewSet(viewsets.ModelViewSet):
     # ------------------------------
     @swagger_auto_schema(
         operation_summary="Obtener una variante por ID",
-        responses={200: "Success", 404: "Not found"}
+        operation_description=(
+            "Obtiene una variante según su ID.\n\n"
+            "Posibles errores:\n"
+            "- 400: ID inválido\n"
+            "- 404: Variante no encontrada\n"
+            "- 500: Unexpected server error"
+        ),
+        responses={
+            200: "Success",
+            400: "Invalid ID",
+            404: "Variant not found",
+            500: "Unexpected server error"
+        }
     )
     def retrieve(self, request, pk=None):
         result = VariantService.get_variant(pk)
@@ -38,7 +58,21 @@ class VariantViewSet(viewsets.ModelViewSet):
     # ------------------------------
     @swagger_auto_schema(
         operation_summary="Crear una variante",
-        responses={201: "Created", 400: "Bad request", 404: "Gene not found"}
+        operation_description=(
+            "Crea una variante genética.\n\n"
+            "Posibles errores:\n"
+            "- 400: Datos inválidos\n"
+            "- 404: Gene not found\n"
+            "- 409: La variante ya existe\n"
+            "- 500: Unexpected server error"
+        ),
+        responses={
+            201: "Created",
+            400: "Bad request",
+            404: "Gene not found",
+            409: "Variant already exists",
+            500: "Unexpected server error"
+        }
     )
     def create(self, request, *args, **kwargs):
         result = VariantService.create_variant(request.data)
@@ -49,7 +83,21 @@ class VariantViewSet(viewsets.ModelViewSet):
     # ------------------------------
     @swagger_auto_schema(
         operation_summary="Actualizar una variante",
-        responses={200: "Success", 400: "Bad request", 404: "Not found"}
+        operation_description=(
+            "Actualiza una variante genética.\n\n"
+            "Posibles errores:\n"
+            "- 400: Datos inválidos o ID inválido\n"
+            "- 404: Variante o gen no encontrado\n"
+            "- 409: Variante duplicada\n"
+            "- 500: Unexpected server error"
+        ),
+        responses={
+            200: "Success",
+            400: "Bad request / Invalid ID",
+            404: "Variant or gene not found",
+            409: "Duplicate variant",
+            500: "Unexpected server error",
+        }
     )
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -61,7 +109,19 @@ class VariantViewSet(viewsets.ModelViewSet):
     # ------------------------------
     @swagger_auto_schema(
         operation_summary="Eliminar una variante",
-        responses={200: "Success", 404: "Not found"}
+        operation_description=(
+            "Elimina una variante genética por ID.\n\n"
+            "Posibles errores:\n"
+            "- 400: ID inválido\n"
+            "- 404: Variante no encontrada\n"
+            "- 500: Unexpected server error"
+        ),
+        responses={
+            200: "Success",
+            400: "Invalid ID",
+            404: "Variant not found",
+            500: "Unexpected server error"
+        }
     )
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
