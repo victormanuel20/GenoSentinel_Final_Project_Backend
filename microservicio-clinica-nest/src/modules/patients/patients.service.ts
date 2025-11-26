@@ -1,11 +1,11 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { Patient } from './entities/patient.entity';
-import { PatientResponseDto } from './dto/patient-response.dto';
-import { CreatePatientDto } from './dto/create-patient.dto';
-import { SearchPatientDto } from './dto/search-patient.dto';
-import { UpdatePatientDto } from './dto/update-patient.dto';
-import { DesactivatePatientDto } from './dto/DesactivatePatientDto';
+import { PatientResponseOutDto } from './dto/patient-response-out.dto';
+import { CreatePatientInDto } from './dto/create-patient-in.dto';
+import { SearchPatientInDto } from './dto/search-patient-in.dto';
+import { UpdatePatientInDto } from './dto/update-patient-in.dto';
+import { DesactivatePatientInDto } from './dto/DesactivatePatient-in.Dto';
 import { ConflictException, Injectable } from '@nestjs/common';
 import { PatientAlreadyExistsException } from './exceptions/PatientAlreadyExistsException';
 import { PatientNotFoundException } from './exceptions/patient-not-found.exception';
@@ -13,8 +13,7 @@ import { InvalidSearchParamsException } from './exceptions/invalid-search-params
 import { PatientsNotFoundException } from './exceptions/PatientsNotFoundException';
 import { PatientUpdateFailedException } from './exceptions/PatientUpdateFailedException';
 import { PatientAlreadyInactiveException } from './exceptions/PatientAlreadyInactiveException';
-
-
+import {CannotDeleteActivePatientException} from './exceptions/CannotDeleteActivePatientException';
 
 @Injectable()
 export class PatientsService {
@@ -23,7 +22,7 @@ export class PatientsService {
     private readonly patientRepository: Repository<Patient>,
   ) {}
 
-   async findAll(): Promise<PatientResponseDto[]> {
+   async findAll(): Promise<PatientResponseOutDto[]> {
     const patients = await this.patientRepository.find();
     
     return patients.map(patient => ({
@@ -38,7 +37,7 @@ export class PatientsService {
 
 
   // BUSCAR POR ID
-  async findOne(id: number): Promise<PatientResponseDto> {
+  async findOne(id: number): Promise<PatientResponseOutDto> {
     const patient = await this.patientRepository.findOne({
       where: { id },
     });
@@ -51,7 +50,7 @@ export class PatientsService {
   }
 
   // BUSCAR POR CRITERIOS (nombre, apellido, fecha)
-  async search(searchDto: SearchPatientDto): Promise<PatientResponseDto[]> {
+  async search(searchDto: SearchPatientInDto): Promise<PatientResponseOutDto[]> {
     // Validar que al menos un criterio esté presente
     if (!searchDto.firstName && !searchDto.lastName && !searchDto.birthDate) {
       throw new InvalidSearchParamsException();
@@ -86,7 +85,7 @@ export class PatientsService {
   }
 
 
-  async create(createPatientDto: CreatePatientDto): Promise<PatientResponseDto> {
+  async create(createPatientDto: CreatePatientInDto): Promise<PatientResponseOutDto> {
     // 1. Buscar pacientes con el mismo nombre Y fecha
     const existingPatient = await this.patientRepository.findOne({
       where: {
@@ -135,7 +134,7 @@ export class PatientsService {
   }
 
   //Convertir Entity a DTO
-  private toResponseDto(patient: Patient): PatientResponseDto {
+  private toResponseDto(patient: Patient): PatientResponseOutDto {
     return {
       id: patient.id,
       firstName: patient.firstName,
@@ -147,7 +146,7 @@ export class PatientsService {
   }
 
 
-  async update(id: number, updatePatientDto: UpdatePatientDto): Promise<PatientResponseDto> {
+  async update(id: number, updatePatientDto: UpdatePatientInDto): Promise<PatientResponseOutDto> {
   // 1. Verificar que el paciente existe
   const existingPatient = await this.patientRepository.findOne({
     where: { id },
@@ -198,7 +197,7 @@ if (updatePatientDto.firstName || updatePatientDto.lastName || updatePatientDto.
 }
 
 //Desactivar paciente 
-async desactivate(id: number, deactivatePatientDto: DesactivatePatientDto): Promise<PatientResponseDto> {
+async desactivate(id: number, deactivatePatientDto: DesactivatePatientInDto): Promise<PatientResponseOutDto> {
   // 1. Verificar que el paciente existe
   const existingPatient = await this.patientRepository.findOne({
     where: { id },
@@ -233,6 +232,29 @@ async desactivate(id: number, deactivatePatientDto: DesactivatePatientDto): Prom
 
   return this.toResponseDto(updatedPatient);
 }
+
+async remove(id: number): Promise<{ message: string; success: boolean }> {
+  // 1. Verificar que el paciente existe
+  const patient = await this.patientRepository.findOne({ where: { id } });
+
+  if (!patient) {
+    throw new PatientNotFoundException(id);
+  }
+
+  // 2. Evitar borrar un paciente ACTIVO
+  if (patient.status !== 'Inactivo') {
+    throw new CannotDeleteActivePatientException(id);
+  }
+
+  // 3. Eliminar → CASCADE borrará automáticamente sus historias clínicas
+  await this.patientRepository.remove(patient);
+
+  return {
+    message: `Paciente con ID ${id} eliminado exitosamente`,
+    success: true,
+  };
+}
+
 
 
 

@@ -1,9 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete,HttpCode, HttpStatus,ParseIntPipe } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse,ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse,ApiParam,ApiQuery} from '@nestjs/swagger';
 import { TumorTypesService } from './tumor-types.service';
-import { TumorTypeResponseDto } from './dto/TumorTypeResponseDto';
-import { CreateTumorTypeDto } from './dto/create-tumor-type.dto';
-import { UpdateTumorTypeDto } from './dto/update-tumor-type.dto';
+import { TumorTypeResponseOutDto } from './dto/TumorTypeResponse-outDto';
+import { CreateTumorTypeInDto } from './dto/create-tumor-type-in.dto';
+import { UpdateTumorTypeInDto } from './dto/update-tumor-type-in.dto';
+import { SearchTumorTypeInDto } from './dto/SearchTumorTypeInDto';
+import { Query } from '@nestjs/common';
+
 
 @ApiTags('Tipos de Tumor')
 @Controller('tumor-types')
@@ -17,13 +20,13 @@ export class TumorTypesController {
   @ApiResponse({ 
     status: 201, 
     description: 'Tipo de tumor creado exitosamente',
-    type: TumorTypeResponseDto,
+    type: TumorTypeResponseOutDto,
   })
   @ApiResponse({ 
     status: 409, 
     description: 'Ya existe un tipo de tumor con ese nombre',
   })
-  async create(@Body() createDto: CreateTumorTypeDto): Promise<TumorTypeResponseDto> {
+  async create(@Body() createDto: CreateTumorTypeInDto): Promise<TumorTypeResponseOutDto> {
     return await this.tumorTypesService.create(createDto);
   }
 
@@ -33,11 +36,57 @@ export class TumorTypesController {
   @ApiResponse({ 
     status: 200, 
     description: 'Lista de tipos de tumor',
-    type: [TumorTypeResponseDto],
+    type: [TumorTypeResponseOutDto],
   })
-  async findAll(): Promise<TumorTypeResponseDto[]> {
+  async findAll(): Promise<TumorTypeResponseOutDto[]> {
     return await this.tumorTypesService.findAll();
   }
+
+    // 7. BUSCAR POR CRITERIOS (
+  @Get('search')
+  @ApiOperation({ summary: 'Buscar tipos de tumor por nombre o sistema afectado' })
+  @ApiQuery({ name: 'name', required: false, description: 'Nombre del tipo de tumor (búsqueda parcial)' })
+  @ApiQuery({ name: 'systemAffected', required: false, description: 'Sistema afectado (búsqueda parcial)' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Tipos de tumor encontrados',
+    type: [TumorTypeResponseOutDto],
+    schema: {
+      example: [
+        {
+          id: 1,
+          name: 'Cáncer de mama',
+          systemAffected: 'Glándulas'
+        }
+      ]
+    }
+  })
+  @ApiResponse({ 
+    status: 400, 
+    description: 'Debe proporcionar al menos un criterio de búsqueda',
+    schema: {
+      example: {
+        statusCode: 400,
+        message: 'Debe proporcionar al menos un criterio de búsqueda: name o systemAffected',
+        error: 'Bad Request'
+      }
+    }
+  })
+  @ApiResponse({ 
+    status: 404, 
+    description: 'No se encontraron tipos de tumor con los criterios proporcionados',
+    schema: {
+      example: {
+        statusCode: 404,
+        message: 'No se encontraron tipos de tumor con los criterios: nombre: "NoExiste"',
+        error: 'Not Found'
+      }
+    }
+  })
+  async search(@Query() searchDto: SearchTumorTypeInDto): Promise<TumorTypeResponseOutDto[]> {
+    return await this.tumorTypesService.search(searchDto);
+  }
+
 
   //Listar solo por ID
 
@@ -52,7 +101,7 @@ export class TumorTypesController {
   @ApiResponse({
     status: 200,
     description: 'Tipo de tumor encontrado',
-    type: TumorTypeResponseDto,
+    type: TumorTypeResponseOutDto,
   })
   @ApiResponse({
     status: 404,
@@ -60,7 +109,7 @@ export class TumorTypesController {
   })
   async findOne(
     @Param('id', ParseIntPipe) id: number,
-  ): Promise<TumorTypeResponseDto> {
+  ): Promise<TumorTypeResponseOutDto> {
     return await this.tumorTypesService.findOne(id);
   }
 
@@ -72,7 +121,7 @@ export class TumorTypesController {
     @ApiResponse({ 
       status: 200, 
       description: 'Tipo de tumor actualizado exitosamente',
-      type: TumorTypeResponseDto,
+      type: TumorTypeResponseOutDto,
       schema: {
         example: {
           id: 1,
@@ -127,38 +176,56 @@ export class TumorTypesController {
     })
     async update(
       @Param('id', ParseIntPipe) id: number,
-      @Body() updateDto: UpdateTumorTypeDto,
-    ): Promise<TumorTypeResponseDto> {
+      @Body() updateDto: UpdateTumorTypeInDto,
+    ): Promise<TumorTypeResponseOutDto> {
       return await this.tumorTypesService.update(id, updateDto);
     }
 
 
-
-
-  /*
-  @Post()
-  create(@Body() createTumorTypeDto: CreateTumorTypeDto) {
-    return this.tumorTypesService.create(createTumorTypeDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.tumorTypesService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.tumorTypesService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTumorTypeDto: UpdateTumorTypeDto) {
-    return this.tumorTypesService.update(+id, updateTumorTypeDto);
-  }
-
+      // 5. ELIMINAR
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.tumorTypesService.remove(+id);
+  @ApiOperation({ summary: 'Eliminar un tipo de tumor' })
+  @ApiParam({ name: 'id', description: 'ID del tipo de tumor a eliminar', example: 4 })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Tipo de tumor eliminado exitosamente',
+    schema: {
+      example: {
+        message: 'Tipo de tumor con ID 4 eliminado exitosamente',
+        success: true
+      }
+    }
+  })
+  @ApiResponse({ 
+    status: 404, 
+    description: 'Tipo de tumor no encontrado',
+    schema: {
+      example: {
+        statusCode: 404,
+        message: 'Tipo de tumor con ID 999 no encontrado',
+        error: 'Not Found'
+      }
+    }
+  })
+  @ApiResponse({ 
+    status: 409, 
+    description: 'No se puede eliminar porque tiene historias clínicas asociadas',
+    schema: {
+      example: {
+        statusCode: 409,
+        message: 'No se puede eliminar el tipo de tumor con ID 1 porque tiene 1 historia(s) clínica(s) asociada(s)',
+        error: 'Conflict'
+      }
+    }
+  })
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<{ message: string; success: boolean }> {
+    return await this.tumorTypesService.remove(id);
   }
-    */
+
+
+
+
+
+
+
 }

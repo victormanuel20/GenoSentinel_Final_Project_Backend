@@ -23,6 +23,7 @@ const invalid_search_params_exception_1 = require("./exceptions/invalid-search-p
 const PatientsNotFoundException_1 = require("./exceptions/PatientsNotFoundException");
 const PatientUpdateFailedException_1 = require("./exceptions/PatientUpdateFailedException");
 const PatientAlreadyInactiveException_1 = require("./exceptions/PatientAlreadyInactiveException");
+const CannotDeleteActivePatientException_1 = require("./exceptions/CannotDeleteActivePatientException");
 let PatientsService = class PatientsService {
     patientRepository;
     constructor(patientRepository) {
@@ -171,6 +172,20 @@ let PatientsService = class PatientsService {
             throw new patient_not_found_exception_1.PatientNotFoundException(id);
         }
         return this.toResponseDto(updatedPatient);
+    }
+    async remove(id) {
+        const patient = await this.patientRepository.findOne({ where: { id } });
+        if (!patient) {
+            throw new patient_not_found_exception_1.PatientNotFoundException(id);
+        }
+        if (patient.status !== 'Inactivo') {
+            throw new CannotDeleteActivePatientException_1.CannotDeleteActivePatientException(id);
+        }
+        await this.patientRepository.remove(patient);
+        return {
+            message: `Paciente con ID ${id} eliminado exitosamente`,
+            success: true,
+        };
     }
 };
 exports.PatientsService = PatientsService;

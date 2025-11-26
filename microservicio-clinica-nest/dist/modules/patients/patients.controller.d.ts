@@ -1,16 +1,20 @@
 import { PatientsService } from './patients.service';
-import { CreatePatientDto } from './dto/create-patient.dto';
-import { UpdatePatientDto } from './dto/update-patient.dto';
-import { PatientResponseDto } from './dto/patient-response.dto';
-import { SearchPatientDto } from './dto/search-patient.dto';
-import { DesactivatePatientDto } from './dto/DesactivatePatientDto';
+import { CreatePatientInDto } from './dto/create-patient-in.dto';
+import { UpdatePatientInDto } from './dto/update-patient-in.dto';
+import { PatientResponseOutDto } from './dto/patient-response-out.dto';
+import { SearchPatientInDto } from './dto/search-patient-in.dto';
+import { DesactivatePatientInDto } from './dto/DesactivatePatient-in.Dto';
 export declare class PatientsController {
     private readonly patientsService;
     constructor(patientsService: PatientsService);
-    findAll(): Promise<PatientResponseDto[]>;
-    search(searchDto: SearchPatientDto): Promise<PatientResponseDto[]>;
-    findOne(id: number): Promise<PatientResponseDto>;
-    create(createPatientDto: CreatePatientDto): Promise<PatientResponseDto>;
-    update(id: number, updatePatientDto: UpdatePatientDto): Promise<PatientResponseDto>;
-    desactivate(id: number, deactivatePatientDto: DesactivatePatientDto): Promise<PatientResponseDto>;
+    findAll(): Promise<PatientResponseOutDto[]>;
+    search(searchDto: SearchPatientInDto): Promise<PatientResponseOutDto[]>;
+    findOne(id: number): Promise<PatientResponseOutDto>;
+    create(createPatientDto: CreatePatientInDto): Promise<PatientResponseOutDto>;
+    update(id: number, updatePatientDto: UpdatePatientInDto): Promise<PatientResponseOutDto>;
+    desactivate(id: number, deactivatePatientDto: DesactivatePatientInDto): Promise<PatientResponseOutDto>;
+    remove(id: number): Promise<{
+        message: string;
+        success: boolean;
+    }>;
 }

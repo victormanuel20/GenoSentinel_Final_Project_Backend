@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete,HttpCode, HttpStatus,Query,ParseIntPipe } from '@nestjs/common';
 import { PatientsService } from './patients.service';
-import { CreatePatientDto } from './dto/create-patient.dto';
-import { UpdatePatientDto } from './dto/update-patient.dto';
-import { PatientResponseDto } from './dto/patient-response.dto';
-import { SearchPatientDto } from './dto/search-patient.dto';
+import { CreatePatientInDto } from './dto/create-patient-in.dto';
+import { UpdatePatientInDto } from './dto/update-patient-in.dto';
+import { PatientResponseOutDto } from './dto/patient-response-out.dto';
+import { SearchPatientInDto } from './dto/search-patient-in.dto';
 import { ApiTags, ApiOperation, ApiResponse,ApiParam, ApiQuery } from '@nestjs/swagger';
-import { DesactivatePatientDto } from './dto/DesactivatePatientDto';
+import { DesactivatePatientInDto } from './dto/DesactivatePatient-in.Dto';
 
 
 
@@ -20,9 +20,9 @@ export class PatientsController {
   @ApiResponse({ 
     status: 200, 
     description: 'Lista de pacientes obtenida exitosamente',
-    type: [PatientResponseDto] // ← Documenta el tipo de respuesta
+    type: [PatientResponseOutDto] // ← Documenta el tipo de respuesta
   })
-  async findAll(): Promise<PatientResponseDto[]> {
+  async findAll(): Promise<PatientResponseOutDto[]> {
     return await this.patientsService.findAll();
   }
 
@@ -35,7 +35,7 @@ export class PatientsController {
   @ApiResponse({ 
     status: 200, 
     description: 'Pacientes encontrados',
-    type: [PatientResponseDto],
+    type: [PatientResponseOutDto],
   })
   @ApiResponse({ 
     status: 400, 
@@ -45,7 +45,7 @@ export class PatientsController {
   status: 404,
   description: 'No se encontraron pacientes con los criterios proporcionados',
   })
-  async search(@Query() searchDto: SearchPatientDto): Promise<PatientResponseDto[]> {
+  async search(@Query() searchDto: SearchPatientInDto): Promise<PatientResponseOutDto[]> {
     return await this.patientsService.search(searchDto);
   }
 
@@ -56,7 +56,7 @@ export class PatientsController {
   @ApiResponse({ 
     status: 200, 
     description: 'Paciente encontrado',
-    type: PatientResponseDto,
+    type: PatientResponseOutDto,
   })
   @ApiResponse({ 
     status: 404, 
@@ -69,7 +69,7 @@ export class PatientsController {
       }
     }
   })
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<PatientResponseDto> {
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<PatientResponseOutDto> {
     return await this.patientsService.findOne(id);
   }
 
@@ -80,7 +80,7 @@ export class PatientsController {
   @ApiResponse({ 
     status: 201, 
     description: 'Paciente creado exitosamente',
-    type: PatientResponseDto,
+    type: PatientResponseOutDto,
   })
   @ApiResponse({ 
     status: 400, 
@@ -104,7 +104,7 @@ export class PatientsController {
       }
     }
   })
-  async create(@Body() createPatientDto: CreatePatientDto): Promise<PatientResponseDto> {
+  async create(@Body() createPatientDto: CreatePatientInDto): Promise<PatientResponseOutDto> {
     return await this.patientsService.create(createPatientDto);
   }
 
@@ -116,7 +116,7 @@ export class PatientsController {
   @ApiResponse({ 
     status: 200, 
     description: 'Paciente actualizado exitosamente',
-    type: PatientResponseDto,
+    type: PatientResponseOutDto,
     schema: {
       example: {
         id: 18,
@@ -163,8 +163,8 @@ export class PatientsController {
   })
   async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updatePatientDto: UpdatePatientDto,
-  ): Promise<PatientResponseDto> {
+    @Body() updatePatientDto: UpdatePatientInDto,
+  ): Promise<PatientResponseOutDto> {
     return await this.patientsService.update(id, updatePatientDto);
   }
 
@@ -175,7 +175,7 @@ export class PatientsController {
 @ApiResponse({ 
   status: 200, 
   description: 'Paciente desactivado exitosamente',
-  type: PatientResponseDto,
+  type: PatientResponseOutDto,
   schema: {
     example: {
       id: 18,
@@ -211,10 +211,37 @@ export class PatientsController {
 })
 async desactivate(
   @Param('id', ParseIntPipe) id: number,
-  @Body() deactivatePatientDto: DesactivatePatientDto, 
-): Promise<PatientResponseDto> {
+  @Body() deactivatePatientDto: DesactivatePatientInDto, 
+): Promise<PatientResponseOutDto> {
   return await this.patientsService.desactivate(id, deactivatePatientDto);
 }
+
+
+  // 7. ELIMINAR PACIENTE
+  @Delete(':id')
+  @ApiOperation({ summary: 'Eliminar un paciente inactivo' })
+  @ApiParam({ name: 'id', description: 'ID del paciente', example: 3 })
+  @ApiResponse({
+    status: 200,
+    description: 'Paciente eliminado exitosamente',
+    schema: {
+      example: {
+        message: 'Paciente con ID 3 eliminado exitosamente',
+        success: true,
+      }
+    }
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Paciente no encontrado',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'No se puede eliminar un paciente activo'
+  })
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return await this.patientsService.remove(id);
+  }
 
 
 }
