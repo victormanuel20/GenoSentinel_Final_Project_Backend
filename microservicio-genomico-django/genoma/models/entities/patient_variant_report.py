@@ -2,7 +2,6 @@ from django.db import models
 from genoma.models import GeneticVariant  # ya existe
 
 class PatientVariantReport(models.Model):
-    id = models.CharField(primary_key=True, max_length=32)
 
     # FOREIGN KEY to patient.id (bigint)
     patient_id = models.BigIntegerField(db_column='patient_id')
