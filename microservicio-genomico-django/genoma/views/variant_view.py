@@ -8,6 +8,7 @@ from genoma.services.VariantService import VariantService
 
 
 class VariantViewSet(viewsets.ModelViewSet):
+    http_method_names = ["get", "post", "put", "delete"]
     serializer_class = VariantSerializer
     queryset = GeneticVariant.objects.all()
 

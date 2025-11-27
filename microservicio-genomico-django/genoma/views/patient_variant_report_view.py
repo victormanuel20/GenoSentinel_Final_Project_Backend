@@ -7,7 +7,7 @@ from genoma.services.PatientVariantReportService import PatientVariantReportServ
 
 
 class PatientVariantReportViewSet(viewsets.ModelViewSet):
-
+    http_method_names = ["get", "post", "put", "delete"]
     serializer_class = PatientVariantReportSerializer
     queryset = []  # DRF lo exige, pero no lo usamos
 

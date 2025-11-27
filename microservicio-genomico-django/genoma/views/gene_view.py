@@ -10,6 +10,7 @@ from genoma.services.GeneService import GeneService
 
 
 class GeneViewSet(viewsets.ModelViewSet):
+    http_method_names = ["get", "post", "put", "delete"]
     serializer_class = GeneSerializer
     queryset = Gene.objects.all()
 
