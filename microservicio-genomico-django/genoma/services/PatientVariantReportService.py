@@ -19,37 +19,25 @@ class PatientVariantReportService:
             raise BadRequestException("patientId must be a valid numeric value")
         return True
 
-    # ---------------------------------------------------
-    # CREATE (MODIFICADO PARA CONSULTAR NEST)
-    # ---------------------------------------------------
     @staticmethod
     def create_report(data):
-
         try:
             dto = CreatePatientVariantReportDTO(data)
         except ValueError as e:
             raise BadRequestException(str(e))
 
-        # Validación mínima
         PatientVariantReportService.validate_patient_id(dto.patient_id)
 
-        # 🔍 Consultar microservicio clínico (NESTJS)
         patient = ClinicServiceClient.get_patient_by_id(dto.patient_id)
-
         if patient is None:
             raise NotFoundException("Patient not found in clinical service")
 
-        # Validar existencia de la variante
         try:
             variant = GeneticVariant.objects.get(id=dto.variant_id)
         except GeneticVariant.DoesNotExist:
             raise NotFoundException("Variant not found")
 
-        # Crear ID tipo UUID (como antes)
-        generated_id = uuid.uuid4().hex
-
         report = PatientVariantReport.objects.create(
-            id=generated_id,
             patient_id=dto.patient_id,
             variant=variant,
             detection_date=dto.detection_date,
