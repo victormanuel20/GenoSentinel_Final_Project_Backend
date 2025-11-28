@@ -135,10 +135,11 @@ class GeneViewSet(viewsets.ModelViewSet):
             500: "Unexpected server error"
         }
     )
-    def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        result = GeneService.update_gene(str(instance.id), request.data)
+
+    def update(self, request, pk=None, *args, **kwargs):
+        result = GeneService.update_gene(pk, request.data) 
         return Response({"success": True, "data": result})
+
 
     # ------------------------------
     # DELETE
@@ -159,7 +160,7 @@ class GeneViewSet(viewsets.ModelViewSet):
             500: "Unexpected server error"
         }
     )
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        result = GeneService.delete_gene(str(instance.id))
+    def destroy(self, request, pk=None, *args, **kwargs):
+        result = GeneService.delete_gene(pk)
         return Response({"success": True, "data": result})
+
