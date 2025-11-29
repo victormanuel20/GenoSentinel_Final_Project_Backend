@@ -146,3 +146,25 @@ class PatientVariantReportService:
 
         report.delete()
         return {"message": "Report deleted successfully"}
+    
+    # ---------------------------------------------------
+    # DELETE BY PATIENT
+    # ---------------------------------------------------
+    @staticmethod
+    def delete_reports_by_patient(patient_id_str):
+        """
+        Elimina todos los reportes de un paciente específico.
+        Usado cuando se elimina un paciente desde el microservicio de Clínica.
+        """
+        patient_id = PatientVariantReportService.validate_positive_int(patient_id_str, "patient_id")
+        
+        reports = PatientVariantReport.objects.filter(patient_id=patient_id)
+        count = reports.count()
+        
+        if count > 0:
+            reports.delete()
+        
+        return {
+            "message": f"{count} report(s) deleted for patient {patient_id}",
+            "deleted": count
+        }

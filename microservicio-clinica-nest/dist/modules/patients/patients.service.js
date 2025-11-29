@@ -24,6 +24,7 @@ const PatientsNotFoundException_1 = require("./exceptions/PatientsNotFoundExcept
 const PatientUpdateFailedException_1 = require("./exceptions/PatientUpdateFailedException");
 const PatientAlreadyInactiveException_1 = require("./exceptions/PatientAlreadyInactiveException");
 const CannotDeleteActivePatientException_1 = require("./exceptions/CannotDeleteActivePatientException");
+const genomic_service_client_1 = require("./gateway/genomic-service.client");
 let PatientsService = class PatientsService {
     patientRepository;
     constructor(patientRepository) {
@@ -79,12 +80,12 @@ let PatientsService = class PatientsService {
                 birthDate: createPatientDto.birthDate,
             },
         });
-        console.log('🔍 Buscando duplicado:', {
+        console.log(' Buscando duplicado:', {
             firstName: createPatientDto.firstName,
             lastName: createPatientDto.lastName,
             birthDate: createPatientDto.birthDate,
         });
-        console.log('🔍 Resultado:', existingPatient);
+        console.log(' Resultado:', existingPatient);
         if (existingPatient) {
             throw new PatientAlreadyExistsException_1.PatientAlreadyExistsException(createPatientDto.firstName, createPatientDto.lastName, createPatientDto.birthDate);
         }
@@ -181,9 +182,16 @@ let PatientsService = class PatientsService {
         if (patient.status !== 'Inactivo') {
             throw new CannotDeleteActivePatientException_1.CannotDeleteActivePatientException(id);
         }
+        const genomicReportsDeleted = await genomic_service_client_1.GenomicServiceClient.deleteReportsByPatient(id);
         await this.patientRepository.remove(patient);
+        const deletedItems = [];
+        deletedItems.push('1 paciente');
+        deletedItems.push('historias clínicas asociadas');
+        if (genomicReportsDeleted > 0) {
+            deletedItems.push(`${genomicReportsDeleted} reporte(s) genómico(s)`);
+        }
         return {
-            message: `Paciente con ID ${id} eliminado exitosamente`,
+            message: `Paciente con ID ${id} eliminado exitosamente. Se eliminaron: ${deletedItems.join(', ')}`,
             success: true,
         };
     }

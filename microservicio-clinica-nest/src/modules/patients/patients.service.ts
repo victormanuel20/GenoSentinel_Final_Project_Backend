@@ -14,6 +14,7 @@ import { PatientsNotFoundException } from './exceptions/PatientsNotFoundExceptio
 import { PatientUpdateFailedException } from './exceptions/PatientUpdateFailedException';
 import { PatientAlreadyInactiveException } from './exceptions/PatientAlreadyInactiveException';
 import {CannotDeleteActivePatientException} from './exceptions/CannotDeleteActivePatientException';
+import { GenomicServiceClient } from './gateway/genomic-service.client';
 
 @Injectable()
 export class PatientsService {
@@ -95,12 +96,12 @@ export class PatientsService {
       },
     });
 
-    console.log('🔍 Buscando duplicado:', {
+    console.log(' Buscando duplicado:', {
       firstName: createPatientDto.firstName,
       lastName: createPatientDto.lastName,
       birthDate: createPatientDto.birthDate,
     });
-    console.log('🔍 Resultado:', existingPatient);
+    console.log(' Resultado:', existingPatient);
 
     if (existingPatient) {
       throw new PatientAlreadyExistsException(
@@ -233,6 +234,7 @@ async desactivate(id: number, deactivatePatientDto: DesactivatePatientInDto): Pr
   return this.toResponseDto(updatedPatient);
 }
 
+/*
 async remove(id: number): Promise<{ message: string; success: boolean }> {
   // 1. Verificar que el paciente existe
   const patient = await this.patientRepository.findOne({ where: { id } });
@@ -254,6 +256,42 @@ async remove(id: number): Promise<{ message: string; success: boolean }> {
     success: true,
   };
 }
+  */
+
+    async remove(id: number): Promise<{ message: string; success: boolean }> {
+    // 1. Verificar que el paciente existe
+    const patient = await this.patientRepository.findOne({ where: { id } });
+
+    if (!patient) {
+      throw new PatientNotFoundException(id);
+    }
+
+    // 2. Evitar borrar un paciente ACTIVO
+    if (patient.status !== 'Inactivo') {
+      throw new CannotDeleteActivePatientException(id);
+    }
+
+    // 3. Eliminar reportes genómicos en Django
+    const genomicReportsDeleted = await GenomicServiceClient.deleteReportsByPatient(id);
+
+    // 4. Eliminar paciente → CASCADE borrará automáticamente clinical_records
+    await this.patientRepository.remove(patient);
+
+    // 5. Construir mensaje detallado
+    const deletedItems: string[] = [];
+    deletedItems.push('1 paciente');
+    deletedItems.push('historias clínicas asociadas');
+    
+    if (genomicReportsDeleted > 0) {
+      deletedItems.push(`${genomicReportsDeleted} reporte(s) genómico(s)`);
+    }
+
+    return {
+      message: `Paciente con ID ${id} eliminado exitosamente. Se eliminaron: ${deletedItems.join(', ')}`,
+      success: true,
+    };
+    
+  }
 
 
 

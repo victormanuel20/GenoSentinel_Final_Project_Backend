@@ -1,6 +1,8 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework.decorators import action
+
 
 from genoma.models.serializers.patient_variant_report_serializer import PatientVariantReportSerializer
 from genoma.services.PatientVariantReportService import PatientVariantReportService
@@ -50,3 +52,13 @@ class PatientVariantReportViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         result = PatientVariantReportService.delete_report(kwargs["pk"])
         return Response({"success": True, "data": result})
+    
+    @swagger_auto_schema(
+        operation_summary="Eliminar todos los reportes de un paciente lo usa nest",
+        responses={200: "Success", 400: "Invalid ID"}
+    )
+    @action(detail=False, methods=["delete"], url_path="by-patient/(?P<patient_id>[^/.]+)")
+    def delete_by_patient(self, request, patient_id=None):
+        result = PatientVariantReportService.delete_reports_by_patient(patient_id)
+        return Response({"success": True, "data": result})
+    
