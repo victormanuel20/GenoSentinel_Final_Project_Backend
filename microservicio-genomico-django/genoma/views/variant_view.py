@@ -100,10 +100,12 @@ class VariantViewSet(viewsets.ModelViewSet):
             500: "Unexpected server error",
         }
     )
-    def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        result = VariantService.update_variant(str(instance.id), request.data)
+
+    def update(self, request, pk=None, *args, **kwargs):
+        # La clave: pasamos el 'pk' directamente al servicio
+        result = VariantService.update_variant(pk, request.data)
         return Response({"success": True, "data": result})
+
 
     # ------------------------------
     # DELETE
@@ -124,7 +126,8 @@ class VariantViewSet(viewsets.ModelViewSet):
             500: "Unexpected server error"
         }
     )
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        result = VariantService.delete_variant(str(instance.id))
+
+    def destroy(self, request, pk=None, *args, **kwargs):
+        # La clave: pasamos el 'pk' directamente al servicio
+        result = VariantService.delete_variant(pk)
         return Response({"success": True, "data": result})

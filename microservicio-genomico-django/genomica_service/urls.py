@@ -23,5 +23,5 @@ urlpatterns = [
     path("openapi.json", schema_view.without_ui(cache_timeout=0), name="schema-json"),
 
     # API principal
-    path("api/", include("genoma.urls")),
+    path("genomico/", include("genoma.urls")),
 ]

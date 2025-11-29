@@ -13,7 +13,7 @@ import { ClinicalRecordsModule } from './modules/clinical-records/clinical-recor
       host: 'localhost',
       port: 3306,
       username: 'root',
-      password: 'mc4A5T8d',
+      password: '123456',
       database: 'genosentinel',
       autoLoadEntities: true, // carga automática de entidades
       synchronize: false,    
