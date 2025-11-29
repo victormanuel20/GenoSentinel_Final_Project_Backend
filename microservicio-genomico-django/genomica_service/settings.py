@@ -86,7 +86,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'genosentinel',        # el nombre de tu BD
         'USER': 'root',                   # tu usuario
-        'PASSWORD': '123456',        # tu password
+        'PASSWORD': 'mc4A5T8d',        # tu password
         'HOST': 'localhost',
         'PORT': '3306',
         'OPTIONS': {

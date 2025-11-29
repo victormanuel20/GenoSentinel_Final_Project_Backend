@@ -1,8 +1,9 @@
 class CreatePatientVariantReportDTO:
 
     def __init__(self, data):
-        self.patient_id = data.get("patient_id")
-        self.variant_id = data.get("variant_id")
+        self.patient_id = str(data.get("patient_id")) if data.get("patient_id") is not None else None
+        self.variant_id = str(data.get("variant_id")) if data.get("variant_id") is not None else None
+
         self.detection_date = data.get("detection_date")
         self.allele_frequency = data.get("allele_frequency")
 

@@ -14,18 +14,18 @@ from genoma.exceptions.duplicate_resource_exception import DuplicateResourceExce
 class PatientVariantReportService:
 
     # ---------------------------------------------------
-    # VALIDACIÓN CENTRALIZADA (igual que VariantService)
+    # VALIDACIÓN CENTRALIZADA
     # ---------------------------------------------------
     @staticmethod
     def validate_positive_int(value, field_name):
 
-        if not isinstance(value, str):
-            raise InvalidTypeException(f"{field_name} must be a numeric string")
+        # Convertimos cualquier cosa a string
+        value_str = str(value)
 
-        if not value.isdigit():
+        if not value_str.isdigit():
             raise InvalidTypeException(f"{field_name} must contain only digits")
 
-        number = int(value)
+        number = int(value_str)
 
         if number < 1:
             raise InvalidNumericValueException(f"{field_name} must be a positive integer")
@@ -47,7 +47,7 @@ class PatientVariantReportService:
         # Validar patient_id
         patient_id = PatientVariantReportService.validate_positive_int(dto.patient_id, "patient_id")
 
-        # Verificar existencia del paciente en NestJS
+        # Verificar existencia del paciente (NestJS)
         patient = ClinicServiceClient.get_patient_by_id(patient_id)
         if patient is None:
             raise NotFoundException("Patient not found in clinical service")
@@ -114,13 +114,11 @@ class PatientVariantReportService:
         except PatientVariantReport.DoesNotExist:
             raise NotFoundException("Report not found")
 
-        # Validar DTO
         try:
             dto = UpdatePatientVariantReportDTO(data)
         except ValueError as ve:
             raise BadRequestException(ve.args[0])
 
-        # Aplicar cambios
         if dto.detection_date is not None:
             report.detection_date = dto.detection_date
 
