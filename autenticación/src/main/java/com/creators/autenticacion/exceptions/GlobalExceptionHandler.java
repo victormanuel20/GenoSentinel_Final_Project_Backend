@@ -83,7 +83,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MicroserviceException.class)
     public ResponseEntity<Map<String, Object>> handleMicroserviceException(MicroserviceException e) {
         Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("timestamp", LocalDateTime.now().toString());
         errorResponse.put("status", e.getStatusCode().value());
         errorResponse.put("error", e.getStatusCode().getReasonPhrase());
 

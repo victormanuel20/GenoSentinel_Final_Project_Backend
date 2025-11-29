@@ -31,4 +31,16 @@ public class PatientGatewayController {
         Object patient = patientGatewayService.getPatientById(id);
         return ResponseEntity.ok(patient);
     }
+
+    @GetMapping("/search")
+    @PreAuthorize("hasRole('USER')")
+    @Operation(summary = "Buscar pacientes por criterios")
+    public ResponseEntity<Object> searchPatients(
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) String birthDate
+    ) {
+        Object patients = patientGatewayService.searchPatients(firstName, lastName, birthDate);
+        return ResponseEntity.ok(patients);
+    }
 }

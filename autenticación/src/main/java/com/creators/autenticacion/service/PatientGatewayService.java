@@ -89,4 +89,57 @@ public class PatientGatewayService {
             );
         }
     }
+
+    public Object searchPatients(String firstName, String lastName, String birthDate) {
+        // Construir la URL con query parameters
+        StringBuilder url = new StringBuilder(CLINICA_URL + "/patients/search?");
+
+        boolean hasParam = false;
+
+        if (firstName != null && !firstName.isEmpty()) {
+            url.append("firstName=").append(firstName);
+            hasParam = true;
+        }
+
+        if (lastName != null && !lastName.isEmpty()) {
+            if (hasParam) url.append("&");
+            url.append("lastName=").append(lastName);
+            hasParam = true;
+        }
+
+        if (birthDate != null && !birthDate.isEmpty()) {
+            if (hasParam) url.append("&");
+            url.append("birthDate=").append(birthDate);
+        }
+
+        try {
+            ResponseEntity<Object> response = restTemplate.exchange(
+                    url.toString(),
+                    HttpMethod.GET,
+                    null,
+                    Object.class
+            );
+
+            return response.getBody();
+
+        } catch (HttpClientErrorException e) {
+            throw new MicroserviceException(
+                    HttpStatus.valueOf(e.getStatusCode().value()),
+                    e.getResponseBodyAsString()
+            );
+
+        } catch (HttpServerErrorException e) {
+            throw new MicroserviceException(
+                    HttpStatus.valueOf(e.getStatusCode().value()),
+                    e.getResponseBodyAsString()
+            );
+
+        } catch (Exception e) {
+            throw new MicroserviceException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "No se pudo conectar con el microservicio de Clinica"
+            );
+        }
+    }
+
 }
