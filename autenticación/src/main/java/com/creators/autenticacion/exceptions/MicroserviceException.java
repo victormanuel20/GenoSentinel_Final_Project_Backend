@@ -14,5 +14,4 @@ public class MicroserviceException extends RuntimeException {
         this.statusCode = statusCode;
         this.errorMessage = errorMessage;
     }
-
 }
