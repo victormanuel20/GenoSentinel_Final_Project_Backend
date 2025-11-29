@@ -103,6 +103,9 @@ public class SecurityConfig {
                                 "/swagger-ui.html"
                         ).permitAll()
                         // Todo lo demás requiere estar autenticado con JWT
+
+                        .requestMatchers("/gateway/**").authenticated()
+
                         .anyRequest().authenticated()
 
                 )
