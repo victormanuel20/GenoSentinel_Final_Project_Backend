@@ -18,8 +18,6 @@ class PatientVariantReportService:
     # ---------------------------------------------------
     @staticmethod
     def validate_positive_int(value, field_name):
-
-        # Convertimos cualquier cosa a string
         value_str = str(value)
 
         if not value_str.isdigit():
@@ -114,18 +112,17 @@ class PatientVariantReportService:
         except ValueError as ve:
             raise BadRequestException(ve.args[0])
 
-        if dto.detection_date is not None:
-            report.detection_date = dto.detection_date
+        #no se permite modificar detection_date
 
-        if dto.allele_frequency is not None:
-            report.allele_frequency = dto.allele_frequency
+        # validacion de allele frecuency
+        report.allele_frequency = dto.allele_frequency
 
         report.save()
 
         return PatientVariantReportDTO(report).to_dict()
 
     # ---------------------------------------------------
-    # PATCH (nuevo)
+    # PATCH
     # ---------------------------------------------------
     @staticmethod
     def patch_report(report_id_str, data):
@@ -137,20 +134,21 @@ class PatientVariantReportService:
         except PatientVariantReport.DoesNotExist:
             raise NotFoundException("Report not found")
 
-        # Obtener valores existentes si no vienen en el body
-        detection_date = data.get("detection_date", report.detection_date)
-        allele_frequency = data.get("allele_frequency", report.allele_frequency)
+        #Si intenta modificar detection_date no se puede
+        if "detection_date" in data:
+            raise BadRequestException("detection_date cannot be modified")
 
-        # Validar campos solo si vienen explícitos
-        if "detection_date" in data and detection_date is None:
-            raise BadRequestException("Invalid detection_date")
+        # Si viene allele_frequency, validarlo con el DTO
+        if "allele_frequency" in data:
 
-        if "allele_frequency" in data and allele_frequency is None:
-            raise BadRequestException("Invalid allele_frequency")
+            try:
+                dto = UpdatePatientVariantReportDTO(data)
+            except ValueError as ve:
+                raise BadRequestException(ve.args[0])
 
-        # Actualizar
-        report.detection_date = detection_date
-        report.allele_frequency = allele_frequency
+            report.allele_frequency = dto.allele_frequency
+
+        # Guardar
         report.save()
 
         return PatientVariantReportDTO(report).to_dict()
