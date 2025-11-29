@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @ControllerAdvice
@@ -86,24 +88,34 @@ public class GlobalExceptionHandler {
         errorResponse.put("status", e.getStatusCode().value());
         errorResponse.put("error", e.getStatusCode().getReasonPhrase());
 
-        // Intentar parsear el mensaje de NestJS
         try {
             JsonNode jsonNode = objectMapper.readTree(e.getErrorMessage());
 
             // Extraer el mensaje de NestJS
             if (jsonNode.has("message")) {
-                errorResponse.put("message", jsonNode.get("message").asText());
+                JsonNode messageNode = jsonNode.get("message");
+
+                if (messageNode.isArray()) {
+                    // ⭐ CAMBIO: Convertir array a string separado por comas
+                    List<String> messages = new ArrayList<>();
+                    for (JsonNode msg : messageNode) {
+                        messages.add(msg.asText());
+                    }
+                    errorResponse.put("message", String.join(", ", messages));
+                } else {
+                    // Si es string simple
+                    errorResponse.put("message", messageNode.asText());
+                }
             } else {
                 errorResponse.put("message", e.getErrorMessage());
             }
 
-            // Agregar detalles adicionales de NestJS si existen
+            // Agregar errorType de NestJS
             if (jsonNode.has("error")) {
                 errorResponse.put("errorType", jsonNode.get("error").asText());
             }
 
         } catch (Exception ex) {
-            // Si no se puede parsear, poner el mensaje completo
             errorResponse.put("message", e.getErrorMessage());
         }
 

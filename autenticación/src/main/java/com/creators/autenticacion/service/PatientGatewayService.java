@@ -1,10 +1,11 @@
 package com.creators.autenticacion.service;
 
 import com.creators.autenticacion.exceptions.MicroserviceException;
+import com.creators.autenticacion.models.dto.patients.CreatePatientInDto;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
@@ -141,5 +142,37 @@ public class PatientGatewayService {
             );
         }
     }
+
+    public Object createPatient(CreatePatientInDto createPatientDto) {
+        String url = CLINICA_URL + "/patients";
+
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<CreatePatientInDto> request = new HttpEntity<>(createPatientDto, headers);
+
+            ResponseEntity<Object> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    request,
+                    Object.class
+            );
+            return response.getBody();
+
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            throw new MicroserviceException(
+                    HttpStatus.valueOf(e.getStatusCode().value()),
+                    e.getResponseBodyAsString()
+            );
+        } catch (Exception e) {
+            throw new MicroserviceException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "No se pudo conectar con el microservicio de Clinica"
+            );
+        }
+    }
+
+
+
 
 }
