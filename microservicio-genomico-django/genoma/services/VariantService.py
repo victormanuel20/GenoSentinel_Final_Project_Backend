@@ -1,7 +1,7 @@
 from genoma.models import GeneticVariant, Gene
-from genoma.models.DTOs.variant_dto import VariantDTO
-from genoma.models.DTOs.create_variant_dto import CreateVariantDTO
-from genoma.models.DTOs.update_variant_dto import UpdateVariantDTO
+from genoma.models.DTOs.variant.variant_out_dto import VariantDTO
+from genoma.models.DTOs.variant.create_variant_in_dto import CreateVariantDTO
+from genoma.models.DTOs.variant.update_variant_in_dto import UpdateVariantDTO
 
 from genoma.exceptions.not_found_exception import NotFoundException
 from genoma.exceptions.bad_request_exception import BadRequestException

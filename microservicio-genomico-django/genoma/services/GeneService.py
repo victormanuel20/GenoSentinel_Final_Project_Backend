@@ -1,7 +1,7 @@
 from genoma.models import Gene
-from genoma.models.DTOs.gene_dto import GeneDTO
-from genoma.models.DTOs.create_gene_dto import CreateGeneDTO
-from genoma.models.DTOs.update_gene_dto import UpdateGeneDTO
+from genoma.models.DTOs.gene.gene_out_dto import GeneDTO
+from genoma.models.DTOs.gene.create_gene_in_dto import CreateGeneDTO
+from genoma.models.DTOs.gene.update_gene_in_dto import UpdateGeneDTO
 
 from genoma.exceptions.not_found_exception import NotFoundException
 from genoma.exceptions.bad_request_exception import BadRequestException

@@ -1,8 +1,8 @@
 from genoma.gateway.clinic_service_client import ClinicServiceClient
 from genoma.models import PatientVariantReport, GeneticVariant
-from genoma.models.DTOs.create_patient_variant_report_dto import CreatePatientVariantReportDTO
-from genoma.models.DTOs.update_patient_variant_report_dto import UpdatePatientVariantReportDTO
-from genoma.models.DTOs.patient_variant_report_dto import PatientVariantReportDTO
+from genoma.models.DTOs.patient_variant_report.create_patient_variant_report_in_dto import CreatePatientVariantReportDTO
+from genoma.models.DTOs.patient_variant_report.update_patient_variant_report_in_dto import UpdatePatientVariantReportDTO
+from genoma.models.DTOs.patient_variant_report.patient_variant_report_out_dto import PatientVariantReportDTO
 
 from genoma.exceptions.not_found_exception import NotFoundException
 from genoma.exceptions.bad_request_exception import BadRequestException
