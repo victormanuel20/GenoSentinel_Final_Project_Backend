@@ -2,6 +2,8 @@ from genoma.models import Gene
 
 class UpdateVariantDTO:
 
+    VALID_IMPACTS = {"Missense", "Frameshift", "Nonsense", "Synonymous", "Unknown"}
+
     def __init__(self, data):
         raw_gene_id = data.get("gene_id")
         self.gene_id = str(raw_gene_id) if raw_gene_id is not None else None
@@ -39,8 +41,15 @@ class UpdateVariantDTO:
         if not self.alternate_base:
             errors["alternate_base"] = "Alternate base is required."
 
+        # -----------------------------------------------
+        # VALIDACIÓN DEL ENUM IMPACT
+        # -----------------------------------------------
         if not self.impact:
             errors["impact"] = "Impact is required."
+        elif self.impact not in self.VALID_IMPACTS:
+            errors["impact"] = (
+                f"Impact must be one of: {', '.join(self.VALID_IMPACTS)}"
+            )
 
         if errors:
             raise ValueError(errors)
