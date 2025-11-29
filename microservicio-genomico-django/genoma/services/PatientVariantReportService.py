@@ -38,21 +38,17 @@ class PatientVariantReportService:
     @staticmethod
     def create_report(data):
 
-        # Validar DTO
         try:
             dto = CreatePatientVariantReportDTO(data)
         except ValueError as ve:
             raise BadRequestException(ve.args[0])
 
-        # Validar patient_id
         patient_id = PatientVariantReportService.validate_positive_int(dto.patient_id, "patient_id")
 
-        # Verificar existencia del paciente (NestJS)
         patient = ClinicServiceClient.get_patient_by_id(patient_id)
         if patient is None:
             raise NotFoundException("Patient not found in clinical service")
 
-        # Validar variant_id
         variant_id = PatientVariantReportService.validate_positive_int(dto.variant_id, "variant_id")
 
         try:
@@ -60,7 +56,7 @@ class PatientVariantReportService:
         except GeneticVariant.DoesNotExist:
             raise NotFoundException("Variant not found")
 
-        # Validar duplicado
+        # Duplicado exacto
         if PatientVariantReport.objects.filter(
             patient_id=patient_id,
             variant_id=variant_id,
@@ -68,7 +64,6 @@ class PatientVariantReportService:
         ).exists():
             raise DuplicateResourceException("This report already exists")
 
-        # Crear registro
         report = PatientVariantReport.objects.create(
             patient_id=patient_id,
             variant=variant,
@@ -102,7 +97,7 @@ class PatientVariantReportService:
         return PatientVariantReportDTO(report).to_dict()
 
     # ---------------------------------------------------
-    # UPDATE
+    # UPDATE (PUT)
     # ---------------------------------------------------
     @staticmethod
     def update_report(report_id_str, data):
@@ -125,6 +120,37 @@ class PatientVariantReportService:
         if dto.allele_frequency is not None:
             report.allele_frequency = dto.allele_frequency
 
+        report.save()
+
+        return PatientVariantReportDTO(report).to_dict()
+
+    # ---------------------------------------------------
+    # PATCH (nuevo)
+    # ---------------------------------------------------
+    @staticmethod
+    def patch_report(report_id_str, data):
+
+        report_id = PatientVariantReportService.validate_positive_int(report_id_str, "report_id")
+
+        try:
+            report = PatientVariantReport.objects.get(id=report_id)
+        except PatientVariantReport.DoesNotExist:
+            raise NotFoundException("Report not found")
+
+        # Obtener valores existentes si no vienen en el body
+        detection_date = data.get("detection_date", report.detection_date)
+        allele_frequency = data.get("allele_frequency", report.allele_frequency)
+
+        # Validar campos solo si vienen explícitos
+        if "detection_date" in data and detection_date is None:
+            raise BadRequestException("Invalid detection_date")
+
+        if "allele_frequency" in data and allele_frequency is None:
+            raise BadRequestException("Invalid allele_frequency")
+
+        # Actualizar
+        report.detection_date = detection_date
+        report.allele_frequency = allele_frequency
         report.save()
 
         return PatientVariantReportDTO(report).to_dict()

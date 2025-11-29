@@ -93,7 +93,7 @@ class VariantService:
         return VariantDTO.from_model(variant).to_dict()
 
     # ------------------------------
-    # UPDATE
+    # UPDATE (PUT)
     # ------------------------------
     @staticmethod
     def update_variant(variant_id_str, data):
@@ -132,6 +132,55 @@ class VariantService:
         variant.reference_base = dto.reference_base
         variant.alternate_base = dto.alternate_base
         variant.impact = dto.impact
+        variant.save()
+
+        return VariantDTO.from_model(variant).to_dict()
+
+    # ------------------------------
+    # PATCH (nuevo)
+    # ------------------------------
+    @staticmethod
+    def patch_variant(variant_id_str, data):
+
+        variant_id = VariantService.validate_positive_int(variant_id_str, "variant_id")
+
+        try:
+            variant = GeneticVariant.objects.get(id=variant_id)
+        except GeneticVariant.DoesNotExist:
+            raise NotFoundException("Variant not found")
+
+        # Obtener valores actuales si no se envían
+        gene_id_raw = data.get("gene_id")
+        chromosome = data.get("chromosome", variant.chromosome)
+        position = data.get("position", variant.position)
+        reference_base = data.get("reference_base", variant.reference_base)
+        alternate_base = data.get("alternate_base", variant.alternate_base)
+        impact = data.get("impact", variant.impact)
+
+        # Si se envía gene_id, validarlo y asignarlo
+        if gene_id_raw is not None:
+            gene_id = VariantService.validate_positive_int(str(gene_id_raw), "gene_id")
+            try:
+                variant.gene = Gene.objects.get(id=gene_id)
+            except Gene.DoesNotExist:
+                raise NotFoundException("Gene not found")
+
+        # Validar duplicado
+        if GeneticVariant.objects.filter(
+            gene_id=variant.gene_id,
+            chromosome=chromosome,
+            position=position,
+            reference_base=reference_base,
+            alternate_base=alternate_base
+        ).exclude(id=variant_id).exists():
+            raise DuplicateResourceException("This variant already exists")
+
+        # Guardar cambios
+        variant.chromosome = chromosome
+        variant.position = position
+        variant.reference_base = reference_base
+        variant.alternate_base = alternate_base
+        variant.impact = impact
         variant.save()
 
         return VariantDTO.from_model(variant).to_dict()

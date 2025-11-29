@@ -8,7 +8,7 @@ from genoma.services.VariantService import VariantService
 
 
 class VariantViewSet(viewsets.ModelViewSet):
-    http_method_names = ["get", "post", "put", "delete"]
+    http_method_names = ["get", "post", "put", "patch", "delete"]
     serializer_class = VariantSerializer
     queryset = GeneticVariant.objects.all()
 
@@ -80,7 +80,7 @@ class VariantViewSet(viewsets.ModelViewSet):
         return Response({"success": True, "data": result}, status=201)
 
     # ------------------------------
-    # UPDATE
+    # UPDATE (PUT)
     # ------------------------------
     @swagger_auto_schema(
         operation_summary="Actualizar una variante",
@@ -100,12 +100,32 @@ class VariantViewSet(viewsets.ModelViewSet):
             500: "Unexpected server error",
         }
     )
-
     def update(self, request, pk=None, *args, **kwargs):
-        # La clave: pasamos el 'pk' directamente al servicio
         result = VariantService.update_variant(pk, request.data)
         return Response({"success": True, "data": result})
 
+    # ------------------------------
+    # PATCH (nuevo)
+    # ------------------------------
+    @swagger_auto_schema(
+        operation_summary="Actualización parcial de una variante",
+        operation_description=(
+            "Permite actualizar parcialmente una variante enviando solo los campos necesarios.\n\n"
+            "Posibles errores:\n"
+            "- 400: Datos inválidos\n"
+            "- 404: Variante o gen no encontrado\n"
+            "- 409: Variante duplicada\n"
+        ),
+        responses={
+            200: "Success",
+            400: "Invalid body",
+            404: "Variant or gene not found",
+            409: "Duplicate variant"
+        }
+    )
+    def partial_update(self, request, pk=None, *args, **kwargs):
+        result = VariantService.patch_variant(pk, request.data)
+        return Response({"success": True, "data": result})
 
     # ------------------------------
     # DELETE
@@ -126,8 +146,6 @@ class VariantViewSet(viewsets.ModelViewSet):
             500: "Unexpected server error"
         }
     )
-
     def destroy(self, request, pk=None, *args, **kwargs):
-        # La clave: pasamos el 'pk' directamente al servicio
         result = VariantService.delete_variant(pk)
         return Response({"success": True, "data": result})

@@ -10,7 +10,7 @@ from genoma.services.GeneService import GeneService
 
 
 class GeneViewSet(viewsets.ModelViewSet):
-    http_method_names = ["get", "post", "put", "delete"]
+    http_method_names = ["get", "post", "put", "patch", "delete"]
     serializer_class = GeneSerializer
     queryset = Gene.objects.all()
 
@@ -115,7 +115,7 @@ class GeneViewSet(viewsets.ModelViewSet):
         return Response({"success": True, "data": result}, status=201)
 
     # ------------------------------
-    # UPDATE
+    # UPDATE (PUT)
     # ------------------------------
     @swagger_auto_schema(
         operation_summary="Actualizar un gen",
@@ -135,11 +135,32 @@ class GeneViewSet(viewsets.ModelViewSet):
             500: "Unexpected server error"
         }
     )
-
     def update(self, request, pk=None, *args, **kwargs):
-        result = GeneService.update_gene(pk, request.data) 
+        result = GeneService.update_gene(pk, request.data)
         return Response({"success": True, "data": result})
 
+    # ------------------------------
+    # PATCH
+    # ------------------------------
+    @swagger_auto_schema(
+        operation_summary="Actualizar parcialmente un gen",
+        operation_description=(
+            "Permite actualizar SOLO los campos enviados.\n\n"
+            "Posibles errores:\n"
+            "- 400: Datos inválidos\n"
+            "- 404: Gen no encontrado\n"
+            "- 409: Símbolo duplicado\n"
+        ),
+        responses={
+            200: "Gen actualizado parcialmente",
+            400: "Datos inválidos",
+            404: "Gen no encontrado",
+            409: "Símbolo duplicado"
+        }
+    )
+    def partial_update(self, request, pk=None, *args, **kwargs):
+        result = GeneService.patch_gene(pk, request.data)
+        return Response({"success": True, "data": result})
 
     # ------------------------------
     # DELETE
@@ -163,4 +184,3 @@ class GeneViewSet(viewsets.ModelViewSet):
     def destroy(self, request, pk=None, *args, **kwargs):
         result = GeneService.delete_gene(pk)
         return Response({"success": True, "data": result})
-

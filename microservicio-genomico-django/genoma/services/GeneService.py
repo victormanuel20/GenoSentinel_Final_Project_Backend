@@ -78,7 +78,7 @@ class GeneService:
         return GeneDTO.from_model(gene).to_dict()
 
     # ------------------------------
-    # UPDATE
+    # UPDATE (PUT)
     # ------------------------------
     @staticmethod
     def update_gene(gene_id_str, data):
@@ -106,6 +106,37 @@ class GeneService:
         return GeneDTO.from_model(gene).to_dict()
 
     # ------------------------------
+    # PATCH (nuevo)
+    # ------------------------------
+    @staticmethod
+    def patch_gene(gene_id_str, data):
+
+        gene_id = GeneService.validate_positive_int(gene_id_str, "gene_id")
+
+        try:
+            gene = Gene.objects.get(id=gene_id)
+        except Gene.DoesNotExist:
+            raise NotFoundException("Gene not found")
+
+        # Obtener valores opcionales sin DTO (para no romper tu patrón)
+        symbol = data.get("symbol", gene.symbol)
+        full_name = data.get("full_name", gene.full_name)
+        function_summary = data.get("function_summary", gene.function_summary)
+
+        # Validar duplicado solo si cambia symbol
+        if symbol != gene.symbol:
+            if Gene.objects.filter(symbol=symbol).exclude(id=gene_id).exists():
+                raise DuplicateResourceException("A gene with this symbol already exists")
+
+        gene.symbol = symbol
+        gene.full_name = full_name
+        gene.function_summary = function_summary
+
+        gene.save()
+
+        return GeneDTO.from_model(gene).to_dict()
+
+    # ------------------------------
     # DELETE
     # ------------------------------
     @staticmethod
@@ -120,6 +151,7 @@ class GeneService:
 
         gene.delete()
         return {"message": "Gene deleted successfully"}
+
     # ------------------------------
     # SEARCH
     # ------------------------------

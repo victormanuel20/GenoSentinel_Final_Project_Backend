@@ -7,7 +7,7 @@ from genoma.services.PatientVariantReportService import PatientVariantReportServ
 
 
 class PatientVariantReportViewSet(viewsets.ModelViewSet):
-    http_method_names = ["get", "post", "put", "delete"]
+    http_method_names = ["get", "post", "put", "patch", "delete"]
     serializer_class = PatientVariantReportSerializer
     queryset = []  # DRF lo exige, pero no lo usamos
 
@@ -41,6 +41,27 @@ class PatientVariantReportViewSet(viewsets.ModelViewSet):
     )
     def update(self, request, *args, **kwargs):
         result = PatientVariantReportService.update_report(kwargs["pk"], request.data)
+        return Response({"success": True, "data": result})
+
+    # ------------------------------
+    # PATCH (nuevo)
+    # ------------------------------
+    @swagger_auto_schema(
+        operation_summary="Actualización parcial del reporte",
+        operation_description=(
+            "Actualiza solo los campos enviados en el cuerpo.\n\n"
+            "Posibles errores:\n"
+            "- 400: Datos inválidos\n"
+            "- 404: Reporte no encontrado\n"
+        ),
+        responses={
+            200: "Success",
+            400: "Invalid body",
+            404: "Report not found"
+        }
+    )
+    def partial_update(self, request, *args, **kwargs):
+        result = PatientVariantReportService.patch_report(kwargs["pk"], request.data)
         return Response({"success": True, "data": result})
 
     @swagger_auto_schema(
