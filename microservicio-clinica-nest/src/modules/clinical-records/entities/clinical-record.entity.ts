@@ -22,14 +22,14 @@ export class ClinicalRecord {
   @Column({ name: 'treatment_protocol', type: 'text', nullable: true })
   treatmentProtocol: string;
 
-  // ✅ Relación N:1 con Patient
+  // Relación N:1 con Patient
   @ManyToOne(() => Patient, (patient) => patient.clinicalRecords, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'patient_id' })
   patient: Patient;
 
-  // ✅ Relación N:1 con TumorType
+  // Relación N:1 con TumorType
   @ManyToOne(() => TumorType, (tumorType) => tumorType.clinicalRecords, {
     onDelete: 'RESTRICT',
   })
