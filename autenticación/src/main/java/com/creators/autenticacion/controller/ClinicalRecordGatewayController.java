@@ -1,5 +1,7 @@
 package com.creators.autenticacion.controller;
 
+import com.creators.autenticacion.models.dto.clinicalRecord.CreateClinicalRecordInDto;
+import com.creators.autenticacion.models.dto.clinicalRecord.UpdateClinicalRecordInDto;
 import com.creators.autenticacion.service.ClinicalRecordGatewayService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -7,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -80,6 +83,47 @@ public class ClinicalRecordGatewayController {
         Object records = clinicalRecordGatewayService.getClinicalRecordsByTumorType(tumorTypeId);
         return ResponseEntity.ok(records);
     }
+
+    @PostMapping
+    @PreAuthorize("hasRole('USER')")
+    @Operation(
+            summary = "Crear una nueva historia clínica",
+            description = "Crea una historia clínica asociada a un paciente y tipo de tumor"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Historia clínica creada exitosamente"),
+            @ApiResponse(responseCode = "400", description = "Datos inválidos"),
+            @ApiResponse(responseCode = "404", description = "Paciente o tipo de tumor no encontrado"),
+            @ApiResponse(responseCode = "409", description = "Ya existe una historia clínica con esos datos"),
+            @ApiResponse(responseCode = "401", description = "No autenticado")
+    })
+    public ResponseEntity<Object> createClinicalRecord(@RequestBody CreateClinicalRecordInDto createDto) {
+        Object record = clinicalRecordGatewayService.createClinicalRecord(createDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(record);
+    }
+
+    @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('USER')")
+    @Operation(
+            summary = "Actualizar la evolución de una historia clínica",
+            description = "Actualiza el stage y/o protocolo de tratamiento de una historia clínica existente"
+    )
+    @Parameter(name = "id", description = "ID de la historia clínica a actualizar", example = "3")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Historia clínica actualizada exitosamente"),
+            @ApiResponse(responseCode = "400", description = "Datos inválidos"),
+            @ApiResponse(responseCode = "404", description = "Historia clínica no encontrada"),
+            @ApiResponse(responseCode = "401", description = "No autenticado")
+    })
+    public ResponseEntity<Object> updateClinicalRecord(
+            @PathVariable Long id,
+            @RequestBody UpdateClinicalRecordInDto updateDto
+    ) {
+        Object record = clinicalRecordGatewayService.updateClinicalRecord(id, updateDto);
+        return ResponseEntity.ok(record);
+    }
+
+
 
 
 

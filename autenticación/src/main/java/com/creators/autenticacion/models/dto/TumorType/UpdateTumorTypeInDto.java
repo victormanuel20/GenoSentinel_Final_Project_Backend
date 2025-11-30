@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
-@JsonInclude(JsonInclude.Include.NON_NULL)  // ✅ Filtra nulls automáticamente
+@JsonInclude(JsonInclude.Include.NON_NULL)  //  Filtra nulls automáticamente
 @Schema(description = "DTO para actualizar un tipo de tumor existente")
 public class UpdateTumorTypeInDto {
 
