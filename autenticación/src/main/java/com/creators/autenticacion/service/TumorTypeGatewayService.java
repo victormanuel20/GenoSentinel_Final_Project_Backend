@@ -1,6 +1,8 @@
 package com.creators.autenticacion.service;
 
 import com.creators.autenticacion.exceptions.MicroserviceException;
+import com.creators.autenticacion.models.dto.TumorType.CreateTumorTypeInDto;
+import com.creators.autenticacion.models.dto.TumorType.UpdateTumorTypeInDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -124,6 +126,94 @@ public class TumorTypeGatewayService {
                     e.getResponseBodyAsString()
             );
 
+        } catch (Exception e) {
+            throw new MicroserviceException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "No se pudo conectar con el microservicio de Clinica"
+            );
+        }
+    }
+
+    // POST /tumor-types - Crear nuevo tipo de tumor
+    public Object createTumorType(CreateTumorTypeInDto createTumorTypeDto) {
+        String url = CLINICA_URL + "/tumor-types";
+
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<CreateTumorTypeInDto> request = new HttpEntity<>(createTumorTypeDto, headers);
+
+            ResponseEntity<Object> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    request,
+                    Object.class
+            );
+            return response.getBody();
+
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            throw new MicroserviceException(
+                    HttpStatus.valueOf(e.getStatusCode().value()),
+                    e.getResponseBodyAsString()
+            );
+        } catch (Exception e) {
+            throw new MicroserviceException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "No se pudo conectar con el microservicio de Clinica"
+            );
+        }
+    }
+
+    // PATCH /tumor-types/:id - Actualizar tipo de tumor
+    public Object updateTumorType(Long id, UpdateTumorTypeInDto updateTumorTypeDto) {
+        String url = CLINICA_URL + "/tumor-types/" + id;
+
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<UpdateTumorTypeInDto> request = new HttpEntity<>(updateTumorTypeDto, headers);
+
+            ResponseEntity<Object> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.PATCH,
+                    request,
+                    Object.class
+            );
+
+            return response.getBody();
+
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            throw new MicroserviceException(
+                    HttpStatus.valueOf(e.getStatusCode().value()),
+                    e.getResponseBodyAsString()
+            );
+        } catch (Exception e) {
+            throw new MicroserviceException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "No se pudo conectar con el microservicio de Clinica"
+            );
+        }
+    }
+
+    // DELETE /tumor-types/:id - Eliminar tipo de tumor
+    public Object deleteTumorType(Long id) {
+        String url = CLINICA_URL + "/tumor-types/" + id;
+
+        try {
+            ResponseEntity<Object> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.DELETE,
+                    null,
+                    Object.class
+            );
+
+            return response.getBody();
+
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            throw new MicroserviceException(
+                    HttpStatus.valueOf(e.getStatusCode().value()),
+                    e.getResponseBodyAsString()
+            );
         } catch (Exception e) {
             throw new MicroserviceException(
                     HttpStatus.SERVICE_UNAVAILABLE,
