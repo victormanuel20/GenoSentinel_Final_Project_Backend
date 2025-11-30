@@ -1,6 +1,8 @@
 package com.creators.autenticacion.controller;
 
-import com.creators.autenticacion.models.dto.patients.CreateGeneInDto;
+import com.creators.autenticacion.models.dto.Gen.CreateGeneInDto;
+import com.creators.autenticacion.models.dto.Gen.PatchGeneInDto;
+import com.creators.autenticacion.models.dto.Gen.UpdateGeneInDto;
 import com.creators.autenticacion.service.GeneGatewayService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -83,6 +85,68 @@ public class GeneGatewayController {
     public ResponseEntity<Object> createGene(@RequestBody CreateGeneInDto createGeneDto) {
         Object gene = geneGatewayService.createGene(createGeneDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(gene);
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('USER')")
+    @Operation(
+            summary = "Actualizar un gen (PUT)",
+            description = "Actualiza todos los campos de un gen existente"
+    )
+    @Parameter(name = "id", description = "ID del gen a actualizar", example = "16")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Gen actualizado exitosamente"),
+            @ApiResponse(responseCode = "400", description = "Datos inválidos"),
+            @ApiResponse(responseCode = "404", description = "Gen no encontrado"),
+            @ApiResponse(responseCode = "409", description = "Símbolo duplicado"),
+            @ApiResponse(responseCode = "401", description = "No autenticado")
+    })
+    public ResponseEntity<Object> updateGene(
+            @PathVariable Long id,
+            @RequestBody UpdateGeneInDto updateGeneDto
+    ) {
+        Object gene = geneGatewayService.updateGene(id, updateGeneDto);
+        return ResponseEntity.ok(gene);
+    }
+
+    @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('USER')")
+    @Operation(
+            summary = "Actualizar parcialmente un gen (PATCH)",
+            description = "Actualiza solo los campos enviados de un gen existente"
+    )
+    @Parameter(name = "id", description = "ID del gen a actualizar", example = "16")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Gen actualizado exitosamente"),
+            @ApiResponse(responseCode = "400", description = "Datos inválidos"),
+            @ApiResponse(responseCode = "404", description = "Gen no encontrado"),
+            @ApiResponse(responseCode = "409", description = "Símbolo duplicado"),
+            @ApiResponse(responseCode = "401", description = "No autenticado")
+    })
+    public ResponseEntity<Object> patchGene(
+            @PathVariable Long id,
+            @RequestBody PatchGeneInDto patchGeneDto
+    ) {
+        Object gene = geneGatewayService.patchGene(id, patchGeneDto);
+        return ResponseEntity.ok(gene);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('USER')")
+    @Operation(
+            summary = "Eliminar un gen",
+            description = "Elimina un gen del sistema"
+    )
+    @Parameter(name = "id", description = "ID del gen a eliminar", example = "16")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Gen eliminado exitosamente"),
+            @ApiResponse(responseCode = "400", description = "ID inválido"),
+            @ApiResponse(responseCode = "404", description = "Gen no encontrado"),
+            @ApiResponse(responseCode = "401", description = "No autenticado")
+    })
+    public ResponseEntity<Object> deleteGene(@PathVariable Long id) {
+        Object result = geneGatewayService.deleteGene(id);
+        return ResponseEntity.ok(result);
     }
 
 

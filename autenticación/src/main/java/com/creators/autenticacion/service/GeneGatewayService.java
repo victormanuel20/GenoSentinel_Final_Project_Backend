@@ -1,9 +1,10 @@
 package com.creators.autenticacion.service;
 
 import com.creators.autenticacion.exceptions.MicroserviceGenomicaException;
-import com.creators.autenticacion.models.dto.patients.CreateGeneInDto;
+import com.creators.autenticacion.models.dto.Gen.CreateGeneInDto;
+import com.creators.autenticacion.models.dto.Gen.PatchGeneInDto;
+import com.creators.autenticacion.models.dto.Gen.UpdateGeneInDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -104,10 +105,9 @@ public class GeneGatewayService {
         }
     }
 
-    
+
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-
     public Object createGene(CreateGeneInDto createGeneDto) {
         String url = GENOMICA_URL + "/genes/";
 
@@ -139,6 +139,101 @@ public class GeneGatewayService {
             );
         }
     }
+
+
+    // PUT /genes/{id} - Actualizar completo
+    public Object updateGene(Long id, UpdateGeneInDto updateGeneDto) {
+        String url = GENOMICA_URL + "/genes/" + id + "/";
+
+        try {
+            String jsonBody = objectMapper.writeValueAsString(updateGeneDto);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<String> request = new HttpEntity<>(jsonBody, headers);
+
+            ResponseEntity<Object> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.PUT,
+                    request,
+                    Object.class
+            );
+
+            return response.getBody();
+
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            throw new MicroserviceGenomicaException(
+                    HttpStatus.valueOf(e.getStatusCode().value()),
+                    e.getResponseBodyAsString()
+            );
+        } catch (Exception e) {
+            throw new MicroserviceGenomicaException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "No se pudo conectar con el microservicio de Genomica"
+            );
+        }
+    }
+
+    // PATCH /genes/{id} - Actualizar parcial
+    public Object patchGene(Long id, PatchGeneInDto patchGeneDto) {
+        String url = GENOMICA_URL + "/genes/" + id + "/";
+
+        try {
+            String jsonBody = objectMapper.writeValueAsString(patchGeneDto);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<String> request = new HttpEntity<>(jsonBody, headers);
+
+            ResponseEntity<Object> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.PATCH,
+                    request,
+                    Object.class
+            );
+
+            return response.getBody();
+
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            throw new MicroserviceGenomicaException(
+                    HttpStatus.valueOf(e.getStatusCode().value()),
+                    e.getResponseBodyAsString()
+            );
+        } catch (Exception e) {
+            throw new MicroserviceGenomicaException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "No se pudo conectar con el microservicio de Genomica"
+            );
+        }
+    }
+
+    // DELETE /genes/{id} - Eliminar
+    public Object deleteGene(Long id) {
+        String url = GENOMICA_URL + "/genes/" + id + "/";
+
+        try {
+            ResponseEntity<Object> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.DELETE,
+                    null,
+                    Object.class
+            );
+
+            return response.getBody();
+
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            throw new MicroserviceGenomicaException(
+                    HttpStatus.valueOf(e.getStatusCode().value()),
+                    e.getResponseBodyAsString()
+            );
+        } catch (Exception e) {
+            throw new MicroserviceGenomicaException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "No se pudo conectar con el microservicio de Genomica"
+            );
+        }
+    }
+
 
 
 
