@@ -122,20 +122,32 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, e.getStatusCode());
     }
 
-    // Handler para Genómica (Django)
     @ExceptionHandler(MicroserviceGenomicaException.class)
-    public ResponseEntity<Map<String, Object>> handleGenomicaException(MicroserviceGenomicaException e) {
+    public ResponseEntity<Map<String, Object>> handleMicroserviceGenomicaException(MicroserviceGenomicaException e) {
         Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("microservice", "Genómica");
         errorResponse.put("status", e.getStatusCode().value());
         errorResponse.put("error", e.getStatusCode().getReasonPhrase());
-        errorResponse.put("microservice", "Genómica");
 
         try {
             JsonNode jsonNode = objectMapper.readTree(e.getErrorMessage());
 
-            // Django: {"error": "mensaje"} o {"success": false, "error": "mensaje"}
+            // Django envía: {"error": {"campo": "mensaje"}}
             if (jsonNode.has("error")) {
-                errorResponse.put("message", jsonNode.get("error").asText());
+                JsonNode errorNode = jsonNode.get("error");
+
+                // Si es un objeto con múltiples campos
+                if (errorNode.isObject()) {
+                    Map<String, String> errors = new HashMap<>();
+                    errorNode.fields().forEachRemaining(entry -> {
+                        errors.put(entry.getKey(), entry.getValue().asText());
+                    });
+                    errorResponse.put("errors", errors);
+                    errorResponse.put("message", "Validation errors");
+                } else {
+                    // Si es un string simple
+                    errorResponse.put("message", errorNode.asText());
+                }
             } else {
                 errorResponse.put("message", e.getErrorMessage());
             }

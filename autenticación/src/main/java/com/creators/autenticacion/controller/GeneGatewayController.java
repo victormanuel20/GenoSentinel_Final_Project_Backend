@@ -1,5 +1,6 @@
 package com.creators.autenticacion.controller;
 
+import com.creators.autenticacion.models.dto.patients.CreateGeneInDto;
 import com.creators.autenticacion.service.GeneGatewayService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -7,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -63,6 +65,24 @@ public class GeneGatewayController {
     public ResponseEntity<Object> searchGeneBySymbol(@RequestParam String symbol) {
         Object genes = geneGatewayService.searchGeneBySymbol(symbol);
         return ResponseEntity.ok(genes);
+    }
+
+
+    @PostMapping
+    @PreAuthorize("hasRole('USER')")
+    @Operation(
+            summary = "Crear un nuevo gen",
+            description = "Crea un gen en el microservicio de genómica"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Gen creado exitosamente"),
+            @ApiResponse(responseCode = "400", description = "Datos inválidos"),
+            @ApiResponse(responseCode = "409", description = "El gen ya existe"),
+            @ApiResponse(responseCode = "401", description = "No autenticado")
+    })
+    public ResponseEntity<Object> createGene(@RequestBody CreateGeneInDto createGeneDto) {
+        Object gene = geneGatewayService.createGene(createGeneDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(gene);
     }
 
 
