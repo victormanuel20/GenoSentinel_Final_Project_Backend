@@ -2,8 +2,7 @@ package com.creators.autenticacion.service;
 
 import com.creators.autenticacion.exceptions.MicroserviceException;
 import com.creators.autenticacion.models.dto.patients.CreatePatientInDto;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.creators.autenticacion.models.dto.patients.UpdatePatientInDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -157,6 +156,90 @@ public class PatientGatewayService {
                     request,
                     Object.class
             );
+            return response.getBody();
+
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            throw new MicroserviceException(
+                    HttpStatus.valueOf(e.getStatusCode().value()),
+                    e.getResponseBodyAsString()
+            );
+        } catch (Exception e) {
+            throw new MicroserviceException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "No se pudo conectar con el microservicio de Clinica"
+            );
+        }
+    }
+
+    public Object updatePatient(Long id, UpdatePatientInDto updatePatientDto) {
+        String url = CLINICA_URL + "/patients/" + id;
+
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<UpdatePatientInDto> request = new HttpEntity<>(updatePatientDto, headers);
+
+            ResponseEntity<Object> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.PATCH,
+                    request,
+                    Object.class
+            );
+
+            return response.getBody();
+
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+
+            throw new MicroserviceException(
+                    HttpStatus.valueOf(e.getStatusCode().value()),
+                    e.getResponseBodyAsString()
+            );
+        } catch (Exception e) {
+            throw new MicroserviceException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "No se pudo conectar con el microservicio de Clinica"
+            );
+        }
+    }
+
+    public Object desactivatePatient(Long id) {
+        String url = CLINICA_URL + "/patients/" + id + "/desactivate";
+
+        try {
+            ResponseEntity<Object> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.PATCH,
+                    null,  // Sin body
+                    Object.class
+            );
+
+            return response.getBody();
+
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            throw new MicroserviceException(
+                    HttpStatus.valueOf(e.getStatusCode().value()),
+                    e.getResponseBodyAsString()
+            );
+        } catch (Exception e) {
+            throw new MicroserviceException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "No se pudo conectar con el microservicio de Clinica"
+            );
+        }
+    }
+
+
+    public Object deletePatient(Long id) {
+        String url = CLINICA_URL + "/patients/" + id;
+
+        try {
+            ResponseEntity<Object> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.DELETE,
+                    null,  // Sin body
+                    Object.class
+            );
+
             return response.getBody();
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {

@@ -96,7 +96,7 @@ public class GlobalExceptionHandler {
                 JsonNode messageNode = jsonNode.get("message");
 
                 if (messageNode.isArray()) {
-                    // ⭐ CAMBIO: Convertir array a string separado por comas
+                    // Convertir array a string separado por comas
                     List<String> messages = new ArrayList<>();
                     for (JsonNode msg : messageNode) {
                         messages.add(msg.asText());
