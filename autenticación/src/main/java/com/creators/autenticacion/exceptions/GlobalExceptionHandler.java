@@ -122,6 +122,31 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, e.getStatusCode());
     }
 
+    // Handler para Genómica (Django)
+    @ExceptionHandler(MicroserviceGenomicaException.class)
+    public ResponseEntity<Map<String, Object>> handleGenomicaException(MicroserviceGenomicaException e) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("status", e.getStatusCode().value());
+        errorResponse.put("error", e.getStatusCode().getReasonPhrase());
+        errorResponse.put("microservice", "Genómica");
+
+        try {
+            JsonNode jsonNode = objectMapper.readTree(e.getErrorMessage());
+
+            // Django: {"error": "mensaje"} o {"success": false, "error": "mensaje"}
+            if (jsonNode.has("error")) {
+                errorResponse.put("message", jsonNode.get("error").asText());
+            } else {
+                errorResponse.put("message", e.getErrorMessage());
+            }
+
+        } catch (Exception ex) {
+            errorResponse.put("message", e.getErrorMessage());
+        }
+
+        return new ResponseEntity<>(errorResponse, e.getStatusCode());
+    }
+
 
 
 }
