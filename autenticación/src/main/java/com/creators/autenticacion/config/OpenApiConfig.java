@@ -6,6 +6,8 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+
 
 /**
  * Configuración de OpenAPI/Swagger para la API de autenticación.
@@ -18,21 +20,24 @@ public class OpenApiConfig {
     @Bean
     public OpenAPI customOpenAPI() {
 
-        // Esquema de seguridad Bearer JWT (para el botón Authorize en Swagger)
+        String securitySchemeName = "bearer-jwt";
+
         SecurityScheme securityScheme = new SecurityScheme()
-                .name("bearer-jwt")                      // Nombre interno del esquema
-                .type(SecurityScheme.Type.HTTP)          // Tipo HTTP (usa header Authorization)
-                .scheme("bearer")                        // Palabra "Bearer"
-                .bearerFormat("JWT")                     // Formato (solo informativo)
-                .description("Introduce el token en formato: Bearer {token}");
+                .name(securitySchemeName)
+                .type(SecurityScheme.Type.HTTP)
+                .scheme("bearer")
+                .bearerFormat("JWT")
+                .description("Introduce solo el token JWT (sin 'Bearer')");
 
         return new OpenAPI()
                 .info(new Info()
-                        .title("Genosentinel - Servicio de Autenticación")
-                        .description("API de autenticación con JWT para el proyecto Genosentinel")
+                        .title("Genosentinel - API Gateway")
+                        .description("API Gateway con autenticación JWT para el proyecto Genosentinel")
                         .version("1.0.0")
                 )
-                // Registramos el esquema, pero NO marcamos todos los endpoints como seguros
-                .components(new Components().addSecuritySchemes("bearer-jwt", securityScheme));
+                .components(new Components()
+                        .addSecuritySchemes(securitySchemeName, securityScheme)
+                )
+                .addSecurityItem(new SecurityRequirement().addList(securitySchemeName));
     }
 }
