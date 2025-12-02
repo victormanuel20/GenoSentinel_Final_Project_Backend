@@ -17,8 +17,10 @@ public class ClinicalRecordGatewayService {
 
     private final RestTemplate restTemplate;
 
-    private static final String CLINICA_URL = "http://localhost:3000/genosentinel/clinica";
-
+    //private static final String CLINICA_URL = "http://localhost:3000/genosentinel/clinica";
+    @Value("${CLINICA_SERVICE_URL:http://localhost:3000/genosentinel/clinica}")
+    private String clinicaUrl;
+    
     // GET /clinical-records - Listar todas
     public Object getAllClinicalRecords() {
         String url = CLINICA_URL + "/clinical-records";
