@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: genomica-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: genomica
+  template:
+    metadata:
+      labels:
+        app: genomica
+    spec:
+      containers:
+        - name: genomica
+          image: genosentinel-genomica:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: genomica-configmap
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: genomica-secret
+                  key: DB_PASSWORD

@@ -22,7 +22,7 @@ public class GeneGatewayService {
 
     private final RestTemplate restTemplate;
 
-    private static final String GENOMICA_URL = "http://localhost:8000/genomico";
+    private static final String GENOMICA_URL = "http://django-genomica:8000/genomico";
 
     // GET /genes - Listar todos
     public Object getAllGenes() {

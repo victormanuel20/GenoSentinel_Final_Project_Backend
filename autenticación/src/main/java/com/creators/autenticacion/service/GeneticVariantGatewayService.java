@@ -21,7 +21,7 @@ public class GeneticVariantGatewayService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private static final String GENOMICA_URL = "http://localhost:8000/genomico";
+    private static final String GENOMICA_URL = "http://django-genomica:8000/genomico";
 
     // GET /variants - Listar todas
     public Object getAllGeneticVariants() {

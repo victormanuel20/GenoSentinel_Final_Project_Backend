@@ -12,28 +12,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='patientvariantreport',
-            name='allele_frequency',
-            field=models.DecimalField(decimal_places=3, max_digits=5),
-        ),
-        migrations.AlterField(
-            model_name='patientvariantreport',
-            name='id',
-            field=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False),
-        ),
-        migrations.AlterField(
-            model_name='patientvariantreport',
-            name='patient_id',
-            field=models.UUIDField(),
-        ),
-        migrations.AlterField(
-            model_name='patientvariantreport',
-            name='variant',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='genoma.geneticvariant'),
-        ),
-        migrations.AlterModelTable(
-            name='patientvariantreport',
-            table='patient_variant_reports',
-        ),
+   
     ]

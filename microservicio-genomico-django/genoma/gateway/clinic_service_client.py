@@ -3,7 +3,7 @@ from genoma.exceptions.not_found_exception import NotFoundException
 
 class ClinicServiceClient:
 
-    BASE_URL = "http://localhost:3000/genosentinel/clinica"
+    BASE_URL = "http://nestjs-clinica:3000/genosentinel/clinica"
 
     @staticmethod
     def get_patient_by_id(patient_id):

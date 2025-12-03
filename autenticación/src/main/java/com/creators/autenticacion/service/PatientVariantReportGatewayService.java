@@ -19,7 +19,7 @@ public class PatientVariantReportGatewayService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private static final String GENOMICA_URL = "http://localhost:8000/genomico";
+    private static final String GENOMICA_URL = "http://django-genomica:8000/genomico";
 
     // GET /patient-variant-reports - Listar todos
     public Object getAllPatientVariantReports() {

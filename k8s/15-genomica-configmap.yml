@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: genomica-configmap
+data:
+  DB_HOST: "mysql"
+  DB_PORT: "3306"
+  DB_USERNAME: "root"
+  DB_DATABASE: "genosentinel"

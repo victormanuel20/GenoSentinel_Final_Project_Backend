@@ -81,20 +81,26 @@ WSGI_APPLICATION = 'genomica_service.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+import os
+
+ALLOWED_HOSTS = ['*']
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'genosentinel',        # el nombre de tu BD
-        'USER': 'root',                   # tu usuario
-        'PASSWORD': '123456',        # tu password
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'NAME': os.getenv('DB_DATABASE', 'genosentinel'),
+        'USER': os.getenv('DB_USERNAME', 'root'),
+        'PASSWORD': os.getenv('DB_PASSWORD', '123456'),
+        'HOST': os.getenv('DB_HOST', 'mysql'),  # ← nombre del Service de MySQL
+        'PORT': os.getenv('DB_PORT', '3306'),
         'OPTIONS': {
             'charset': 'utf8mb4',
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
         }
     }
 }
+
+DEBUG = True
+
 
 
 
