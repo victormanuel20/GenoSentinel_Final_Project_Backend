@@ -16,7 +16,7 @@ public class PatientGatewayService {
 
     private final RestTemplate restTemplate;
 
-    private static final String CLINICA_URL = "http://localhost:3000/genosentinel/clinica";
+    private static final String CLINICA_URL = "http://nestjs-clinica:3000/genosentinel/clinica";
 
     public Object getAllPatients() {
         String url = CLINICA_URL + "/patients";

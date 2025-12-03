@@ -18,7 +18,7 @@ public class TumorTypeGatewayService {
 
     private final RestTemplate restTemplate;
 
-    private static final String CLINICA_URL = "http://localhost:3000/genosentinel/clinica";
+    private static final String CLINICA_URL = "http://nestjs-clinica:3000/genosentinel/clinica";
 
     // GET /tumor-types - Listar todos
     public Object getAllTumorTypes() {

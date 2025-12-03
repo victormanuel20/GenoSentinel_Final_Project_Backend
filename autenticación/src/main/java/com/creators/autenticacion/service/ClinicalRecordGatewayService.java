@@ -4,6 +4,7 @@ import com.creators.autenticacion.exceptions.MicroserviceException;
 import com.creators.autenticacion.models.dto.clinicalRecord.CreateClinicalRecordInDto;
 import com.creators.autenticacion.models.dto.clinicalRecord.UpdateClinicalRecordInDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -17,10 +18,9 @@ public class ClinicalRecordGatewayService {
 
     private final RestTemplate restTemplate;
 
-    //private static final String CLINICA_URL = "http://localhost:3000/genosentinel/clinica";
-    @Value("${CLINICA_SERVICE_URL:http://localhost:3000/genosentinel/clinica}")
-    private String clinicaUrl;
-    
+    private static final String CLINICA_URL = "http://nestjs-clinica:3000/genosentinel/clinica";
+
+
     // GET /clinical-records - Listar todas
     public Object getAllClinicalRecords() {
         String url = CLINICA_URL + "/clinical-records";
