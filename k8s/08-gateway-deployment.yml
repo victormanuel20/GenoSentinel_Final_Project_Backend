@@ -20,10 +20,10 @@ spec:
             - containerPort: 8080
           envFrom:
             - configMapRef:
-                name: db-configmap
+                name: gateway-configmap
           env:
             - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: db-secret
+                  name: gateway-secret
                   key: SPRING_DATASOURCE_PASSWORD
